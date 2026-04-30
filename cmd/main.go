@@ -12,6 +12,7 @@ import (
 	"github.com/kissanjamgit/preview/config"
 	"github.com/kissanjamgit/preview/hd8k"
 	"github.com/kissanjamgit/preview/manyv"
+	"github.com/kissanjamgit/preview/nporn"
 	"github.com/kissanjamgit/preview/pbox"
 	"github.com/kissanjamgit/preview/pworld"
 	smex "github.com/kissanjamgit/preview/sexmex"
@@ -136,6 +137,7 @@ func buildDomains() (d []Host) {
 		&Site{`sexmex`, smex.New},
 		&Site{`vip4k`, vip.New},
 		&Site{`pornhd8k`, hd8k.New},
+		&Site{`nubiles`, nporn.New},
 	)
 	return
 }
@@ -162,27 +164,37 @@ func getM3U(cmd *cobra.Command, args []string, index int) (m3u string, err error
 	host := hostList[input]
 	var site Site
 
-	if f, ok := host.(*Family); ok {
-		var buff strings.Builder
-		for i, d := range f.List {
-			fmt.Fprintf(&buff, "%2d: %s\n", i, d.Name())
-		}
-		cmd.Example = buff.String()
+	switch h := host.(type) {
+	case *Family:
+		{
+			var buff strings.Builder
+			for i, d := range h.List {
+				fmt.Fprintf(&buff, "%2d: %s\n", i, d.Name())
+			}
+			cmd.Example = buff.String()
 
-		if len(args) < 2 {
-			err = fmt.Errorf("need one more argument")
-			return
+			if len(args) < 2 {
+				err = fmt.Errorf("need one more argument")
+				return
+			}
+			subIndex, err := strconv.Atoi(args[1])
+			if err != nil {
+				return ``, err
+			}
+			if subIndex < 0 || subIndex >= len(h.List) {
+				fmt.Println(subIndex < len(h.List))
+				err = fmt.Errorf("subIndex >= 0 && subIndex < len(f.List); subindex: %d", subIndex)
+				return ``, err
+			}
+			site = h.List[subIndex]
 		}
-		subIndex, err := strconv.Atoi(args[1])
-		if err != nil {
-			return ``, err
-		}
-		if subIndex < 0 || subIndex >= len(f.List) {
-			fmt.Println(subIndex < len(f.List))
-			err = fmt.Errorf("subIndex >= 0 && subIndex < len(f.List); subindex: %d", subIndex)
-			return ``, err
-		}
-		site = f.List[subIndex]
+	case *Site:
+		site = *h
+
+	default:
+		err = fmt.Errorf("switch case exhausted")
+		return
+
 	}
 
 	pr, err := site.View(site.name).Get(index)

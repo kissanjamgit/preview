@@ -31,14 +31,17 @@ type adaptJSONHits struct {
 
 var size = 30
 
+var tree = map[string]string{"teamskeet": "ts_network", "swappz": "swap_bundle", "freeuse": "freeusebundle"}
+
 func (t *teamskt) Get(index int) (list []preview.ContentResource, err error) {
 	if index < 0 {
 		err = fmt.Errorf("index must be greater than 0")
 		return
 	}
+	studioPath := tree[t.Source]
 	pad := size * index
 	client := resty.New()
-	uri := "https://tours-store.psmcdn.net/ts_network/_search?sort=publishedDate:desc&q=(type:video%20AND%20isXSeries:false%20AND%20isUpcoming:false)&size=" + strconv.Itoa(size) + "&from=" + strconv.Itoa(pad)
+	uri := "https://tours-store.psmcdn.net/" + studioPath + "/_search?sort=publishedDate:desc&q=(type:video%20AND%20isXSeries:false%20AND%20isUpcoming:false)&size=" + strconv.Itoa(size) + "&from=" + strconv.Itoa(pad)
 	res, err := client.R().Get(uri)
 	var adapt adaptJSONHits
 	json.Unmarshal(res.Bytes(), &adapt)
@@ -47,6 +50,10 @@ func (t *teamskt) Get(index int) (list []preview.ContentResource, err error) {
 		list = append(list, preview.ContentResource{Source: item.Source.Video + `@` + strings.Replace(item.Source.Title, " ", "-", -1), View: item.Source.Trailer})
 	}
 	return
+}
+
+var Domain = []string{
+	`teamskeet`, `swappz`, `freeuse`,
 }
 
 func New(source string) preview.Preview {

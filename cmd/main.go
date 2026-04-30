@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"maps"
 	"net/url"
+	"os"
 	"os/exec"
 	"strconv"
 	"strings"
@@ -24,7 +25,37 @@ import (
 )
 
 ///todo
-//vip4k
+//https://tours-store.psmcdn.net/swap_bundle/_search?sort=publishedDate:desc&q=(type:video%20AND%20isXSeries:false%20)&size=30&from=30
+// GET /swap_bundle/_search?sort=publishedDate:desc&q=(type:video%20AND%20isXSeries:false%20)&size=30&from=30 HTTP/2
+// Host: tours-store.psmcdn.net
+// User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:150.0) Gecko/20100101 Firefox/150.0
+// Accept: */*
+// Accept-Language: en-US,en;q=0.9
+// Accept-Encoding: gzip, deflate, br, zstd
+// Referer: https://www.swappz.com/
+// Origin: https://www.swappz.com
+// Sec-GPC: 1
+// Connection: keep-alive
+// Sec-Fetch-Dest: empty
+// Sec-Fetch-Mode: cors
+// Sec-Fetch-Site: cross-site
+// Priority: u=0
+//https://tours-store.psmcdn.net/freeusebundle/_search?q=(site.seo.seoSlug.keyword:%22freeuse-fantasy%22%20AND%20type:video)&sort=publishedDate:desc&size=30&from=30
+// GET /freeusebundle/_search?q=(site.seo.seoSlug.keyword:%22freeuse-fantasy%22%20AND%20type:video)&sort=publishedDate:desc&size=30&from=30 HTTP/2
+// Host: tours-store.psmcdn.net
+// User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:150.0) Gecko/20100101 Firefox/150.0
+// Accept: */*
+// Accept-Language: en-US,en;q=0.9
+// Accept-Encoding: gzip, deflate, br, zstd
+// Referer: https://www.freeuse.com/
+// Origin: https://www.freeuse.com
+// Sec-GPC: 1
+// Connection: keep-alive
+// Sec-Fetch-Dest: empty
+// Sec-Fetch-Mode: cors
+// Sec-Fetch-Site: cross-site
+// Priority: u=0
+// TE: trailers
 //nubiles-porn
 //https://en.inkasex.com/videos/latest
 //https://pornbox.com/application/studio/328
@@ -128,37 +159,19 @@ func run() (pr []preview.ContentResource, err error) {
 	return
 }
 
-//	func main() {
-//		list, err := run()
-//		if err != nil {
-//			fmt.Println(err)
-//			os.Exit(1)
-//		}
-//		if len(list) == 0 {
-//			return
-//		}
-//		var buffer strings.Builder
-//		buffer.WriteString("#EXTM3U\n")
-//		for _, cr := range list {
-//			buffer.WriteString("#EXTINF:-1," + cr.Source + "\n" + cr.View + "\n")
-//		}
-//		fmt.Println(buffer.String())
-//	}
-
 var domain = buildDomains()
 
-func buildDomains() []Domain {
-	return append(
-		append(
-			toDomainList(brazz.Domain, brazz.New),
-			toDomainList(pbox.Domain, pbox.New)...,
-		),
-		Domain{`teamskeet`, teamskt.New},
-		Domain{`pornworld`, pworld.New},
+func buildDomains() (d []Domain) {
+	d = append(d, toDomainList(brazz.Domain, brazz.New)...)
+	d = append(d, toDomainList(pbox.Domain, pbox.New)...)
+	d = append(d, toDomainList(teamskt.Domain, brazz.New)...)
+
+	d = append(d, Domain{`pornworld`, pworld.New},
 		Domain{`sexmex`, smex.New},
 		Domain{`vip4k`, vip.New},
 		Domain{`pornhd8k`, hd8k.New},
 	)
+	return
 }
 
 var example = func() string {
@@ -184,8 +197,8 @@ func cobraPlay(_ *cobra.Command, args []string, index int, cfg config.Config) (e
 		return
 	}
 
-	str := domain[input].domain
-	pr, err := domainMap()[str](str).Get(index)
+	domain := domain[input]
+	pr, err := domain.view(domain.domain).Get(index)
 	if err != nil {
 		return
 	}
@@ -235,8 +248,10 @@ func cobraShow(_ *cobra.Command, args []string, index int) (err error) {
 		return
 	}
 
-	str := domain[input].domain
-	pr, err := domainMap()[str](str).Get(index)
+	domain := domain[input]
+
+	// pr, err := domainMap()[str](str).Get(index)
+	pr, err := domain.view(domain.domain).Get(index)
 	if err != nil {
 		return
 	}
@@ -250,10 +265,11 @@ func cobraShow(_ *cobra.Command, args []string, index int) (err error) {
 	return
 }
 
-func main() {
+func cli() (err error) {
 	cfg, err := config.New()
 	if err != nil {
-		return
+		fmt.Println(err)
+		os.Exit(1)
 	}
 	cbr := cobra.Command{
 		Use: "view",
@@ -303,5 +319,13 @@ func main() {
 	cbr.AddCommand(&show)
 	cbr.AddCommand(&play)
 	cbr.AddCommand(&search)
-	cbr.Execute()
+	err = cbr.Execute()
+	if err != nil {
+		os.Exit(1)
+	}
+	return
+}
+
+func main() {
+	cli()
 }

@@ -10,6 +10,7 @@ import (
 
 	"github.com/kissanjamgit/preview/brazz"
 	"github.com/kissanjamgit/preview/config"
+	"github.com/kissanjamgit/preview/evil"
 	"github.com/kissanjamgit/preview/hd8k"
 	"github.com/kissanjamgit/preview/manyv"
 	"github.com/kissanjamgit/preview/nporn"
@@ -25,7 +26,6 @@ import (
 )
 
 ///todo
-//nubiles-porn
 //https://en.inkasex.com/videos/latest
 //https://pornbox.com/application/studio/328
 //https://pornbox.com/application/model/188419
@@ -139,6 +139,7 @@ func buildDomains() (d []Host) {
 		&Site{`pornhd8k`, hd8k.New},
 		&Site{`nubiles`, nporn.New},
 	)
+	d = append(d, toDomainList(`evilangel`, evil.Domain, evil.New))
 	return
 }
 
@@ -182,7 +183,6 @@ func getM3U(cmd *cobra.Command, args []string, index int) (m3u string, err error
 				return ``, err
 			}
 			if subIndex < 0 || subIndex >= len(h.List) {
-				fmt.Println(subIndex < len(h.List))
 				err = fmt.Errorf("subIndex >= 0 && subIndex < len(f.List); subindex: %d", subIndex)
 				return ``, err
 			}

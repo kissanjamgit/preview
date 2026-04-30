@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"maps"
 	"net/url"
 	"os"
 	"os/exec"
@@ -25,51 +24,12 @@ import (
 )
 
 ///todo
-//https://tours-store.psmcdn.net/swap_bundle/_search?sort=publishedDate:desc&q=(type:video%20AND%20isXSeries:false%20)&size=30&from=30
-// GET /swap_bundle/_search?sort=publishedDate:desc&q=(type:video%20AND%20isXSeries:false%20)&size=30&from=30 HTTP/2
-// Host: tours-store.psmcdn.net
-// User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:150.0) Gecko/20100101 Firefox/150.0
-// Accept: */*
-// Accept-Language: en-US,en;q=0.9
-// Accept-Encoding: gzip, deflate, br, zstd
-// Referer: https://www.swappz.com/
-// Origin: https://www.swappz.com
-// Sec-GPC: 1
-// Connection: keep-alive
-// Sec-Fetch-Dest: empty
-// Sec-Fetch-Mode: cors
-// Sec-Fetch-Site: cross-site
-// Priority: u=0
-//https://tours-store.psmcdn.net/freeusebundle/_search?q=(site.seo.seoSlug.keyword:%22freeuse-fantasy%22%20AND%20type:video)&sort=publishedDate:desc&size=30&from=30
-// GET /freeusebundle/_search?q=(site.seo.seoSlug.keyword:%22freeuse-fantasy%22%20AND%20type:video)&sort=publishedDate:desc&size=30&from=30 HTTP/2
-// Host: tours-store.psmcdn.net
-// User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:150.0) Gecko/20100101 Firefox/150.0
-// Accept: */*
-// Accept-Language: en-US,en;q=0.9
-// Accept-Encoding: gzip, deflate, br, zstd
-// Referer: https://www.freeuse.com/
-// Origin: https://www.freeuse.com
-// Sec-GPC: 1
-// Connection: keep-alive
-// Sec-Fetch-Dest: empty
-// Sec-Fetch-Mode: cors
-// Sec-Fetch-Site: cross-site
-// Priority: u=0
-// TE: trailers
 //nubiles-porn
 //https://en.inkasex.com/videos/latest
 //https://pornbox.com/application/studio/328
 //https://pornbox.com/application/model/188419
 //https://www.moderndaysins.com/en/video/moderndaysins/One-Bed-Two-In-Laws/261172
 ///
-
-func makeMapWithList[K comparable, V any](keys []K, defaultValue V) map[K]V {
-	m := make(map[K]V, len(keys))
-	for _, k := range keys {
-		m[k] = defaultValue
-	}
-	return m
-}
 
 // func domainList() (l []string) {
 // 	l = append(l, brazz.Domain...)
@@ -81,29 +41,35 @@ func makeMapWithList[K comparable, V any](keys []K, defaultValue V) map[K]V {
 // 	return
 // }
 
-type Domain struct {
-	domain string
-	view   func(string) preview.Preview
+type Host interface {
+	Name() string
 }
 
-func domainMap() map[string]func(string) preview.Preview {
-	m := make(map[string]func(string) preview.Preview)
-	brazzList := makeMapWithList(brazz.Domain, brazz.New)
-	pList := makeMapWithList(pbox.Domain, pbox.New)
-	maps.Copy(m, brazzList)
-	maps.Copy(m, pList)
-	m["teamskeet"] = teamskt.New
-	m["pornworld"] = pworld.New
-	m["sexmex"] = smex.New
-	m["vip4k"] = vip.New
-	m["pornhd8k"] = hd8k.New
-	return m
+type Site struct {
+	name string
+	View func(string) preview.Preview
 }
 
-func toDomainList(list []string, f func(string) preview.Preview) (d []Domain) {
-	for _, i := range list {
-		d = append(d, Domain{i, f})
+func (s *Site) Name() string { return s.name }
+
+type Family struct {
+	name string
+	List []Site
+}
+
+func (f *Family) Name() string { return f.name }
+
+// type Domain struct {
+// 	domain string
+// 	view   func(string) preview.Preview
+// }
+
+func toDomainList(name string, list []string, f func(string) preview.Preview) (d Host) {
+	l := []Site{}
+	for _, s := range list {
+		l = append(l, Site{s, f})
 	}
+	d = &Family{name, l}
 	return
 }
 
@@ -159,36 +125,32 @@ func run() (pr []preview.ContentResource, err error) {
 	return
 }
 
-var domain = buildDomains()
+var hostList = buildDomains()
 
-func buildDomains() (d []Domain) {
-	d = append(d, toDomainList(brazz.Domain, brazz.New)...)
-	d = append(d, toDomainList(pbox.Domain, pbox.New)...)
-	d = append(d, toDomainList(teamskt.Domain, brazz.New)...)
+func buildDomains() (d []Host) {
+	d = append(d, toDomainList(`brazzer`, brazz.Domain, brazz.New))
+	d = append(d, toDomainList(`pornbox`, pbox.Domain, pbox.New))
+	d = append(d, toDomainList(`teamskeet`, teamskt.Domain, teamskt.New))
 
-	d = append(d, Domain{`pornworld`, pworld.New},
-		Domain{`sexmex`, smex.New},
-		Domain{`vip4k`, vip.New},
-		Domain{`pornhd8k`, hd8k.New},
+	d = append(d, &Site{`pornworld`, pworld.New},
+		&Site{`sexmex`, smex.New},
+		&Site{`vip4k`, vip.New},
+		&Site{`pornhd8k`, hd8k.New},
 	)
 	return
 }
 
 var example = func() string {
 	var buff strings.Builder
-	for i, d := range domain {
-		fmt.Fprintf(&buff, "%2d: %s\n", i, d.domain)
+	for i, d := range hostList {
+		fmt.Fprintf(&buff, "%2d: %s\n", i, d.Name())
 	}
 	return buff.String()
 }()
 
-func cobraPlay(_ *cobra.Command, args []string, index int, cfg config.Config) (err error) {
+func getM3U(cmd *cobra.Command, args []string, index int) (m3u string, err error) {
 	if len(args) == 0 {
 		err = fmt.Errorf("need at least one argument")
-		return
-	}
-	if len(args) > 1 {
-		err = fmt.Errorf("too many arguments")
 		return
 	}
 
@@ -197,17 +159,46 @@ func cobraPlay(_ *cobra.Command, args []string, index int, cfg config.Config) (e
 		return
 	}
 
-	domain := domain[input]
-	pr, err := domain.view(domain.domain).Get(index)
-	if err != nil {
-		return
+	host := hostList[input]
+	var site Site
+
+	if f, ok := host.(*Family); ok {
+		var buff strings.Builder
+		for i, d := range f.List {
+			fmt.Fprintf(&buff, "%2d: %s\n", i, d.Name())
+		}
+		cmd.Example = buff.String()
+
+		if len(args) < 2 {
+			err = fmt.Errorf("need one more argument")
+			return
+		}
+		subIndex, err := strconv.Atoi(args[1])
+		if err != nil {
+			return ``, err
+		}
+		if subIndex < 0 || subIndex >= len(f.List) {
+			fmt.Println(subIndex < len(f.List))
+			err = fmt.Errorf("subIndex >= 0 && subIndex < len(f.List); subindex: %d", subIndex)
+			return ``, err
+		}
+		site = f.List[subIndex]
 	}
 
+	pr, err := site.View(site.name).Get(index)
+	if err != nil {
+		return ``, err
+	}
 	var buffer strings.Builder
 	buffer.WriteString("#EXTM3U\n")
 	for _, cr := range pr {
 		buffer.WriteString("#EXTINF:-1," + cr.Source + "\n" + cr.View + "\n")
 	}
+	m3u = buffer.String()
+	return
+}
+
+func cobraPlay(cfg config.Config, str string) (err error) {
 	PlayerArgs := []string{"-"} // stdin input
 	PlayerArgs = append(PlayerArgs, strings.Split(cfg.PlayerArgs, " ")...)
 	playCmd := exec.Command(cfg.Player, PlayerArgs...)
@@ -220,7 +211,7 @@ func cobraPlay(_ *cobra.Command, args []string, index int, cfg config.Config) (e
 	if err != nil {
 		return
 	}
-	_, err = stdin.Write([]byte(buffer.String()))
+	_, err = stdin.Write([]byte(str))
 	if err != nil {
 		return
 	}
@@ -230,38 +221,6 @@ func cobraPlay(_ *cobra.Command, args []string, index int, cfg config.Config) (e
 	}
 	err = playCmd.Wait()
 
-	return
-}
-
-func cobraShow(_ *cobra.Command, args []string, index int) (err error) {
-	if len(args) == 0 {
-		err = fmt.Errorf("need at least one argument")
-		return
-	}
-	if len(args) > 1 {
-		err = fmt.Errorf("too many arguments")
-		return
-	}
-
-	input, err := strconv.Atoi(args[0])
-	if err != nil {
-		return
-	}
-
-	domain := domain[input]
-
-	// pr, err := domainMap()[str](str).Get(index)
-	pr, err := domain.view(domain.domain).Get(index)
-	if err != nil {
-		return
-	}
-
-	var buffer strings.Builder
-	buffer.WriteString("#EXTM3U\n")
-	for _, cr := range pr {
-		buffer.WriteString("#EXTINF:-1," + cr.Source + "\n" + cr.View + "\n")
-	}
-	fmt.Println(buffer.String())
 	return
 }
 
@@ -279,7 +238,12 @@ func cli() (err error) {
 		Use:     "show",
 		Example: example,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return cobraShow(cmd, args, index)
+			m3u, err := getM3U(cmd, args, index)
+			if err != nil {
+				return err
+			}
+			fmt.Println(m3u)
+			return err
 		},
 	}
 
@@ -287,7 +251,12 @@ func cli() (err error) {
 		Use:     "play",
 		Example: example,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return cobraPlay(cmd, args, index, cfg)
+			m3u, err := getM3U(cmd, args, index)
+			if err != nil {
+				return err
+			}
+
+			return cobraPlay(cfg, m3u)
 		},
 	}
 	search := cobra.Command{

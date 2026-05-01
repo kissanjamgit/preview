@@ -11,6 +11,7 @@ import (
 	"github.com/kissanjamgit/preview/allanal"
 	"github.com/kissanjamgit/preview/brazz"
 	"github.com/kissanjamgit/preview/config"
+	"github.com/kissanjamgit/preview/dorcel"
 	"github.com/kissanjamgit/preview/evil"
 	"github.com/kissanjamgit/preview/hd8k"
 	"github.com/kissanjamgit/preview/manyv"
@@ -30,8 +31,6 @@ import (
 
 ///todo
 //https://czechav.com/
-//https://www.private.com/scene/blake-blossom-fucks-another-guy-right-in-front-of-her-husband/27134
-//https://www.dorcelclub.com/en/news-videos-x-marc-dorcel?sorting=new
 //https://enjoyx.com/?nats=MTIuMi4yLjIuMC4wLjAuMC4w
 //https://www.littlecaprice-dreams.com/videos
 //https://en.inkasex.com/videos/latest
@@ -136,6 +135,7 @@ func buildDomains() (d []Host) {
 		&Site{`pornhd8k`, hd8k.New},
 		&Site{`nubiles`, nporn.New},
 		&Site{`private`, private.New},
+		&Site{`dorcel`, dorcel.New},
 	)
 	d = append(d, toDomainList(`newsensations`, newsens.Domain, newsens.New))
 	d = append(d, toDomainList(`allanal`, allanal.Domain, allanal.New))

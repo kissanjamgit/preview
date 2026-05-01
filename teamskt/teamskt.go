@@ -37,7 +37,7 @@ type StudioPath struct {
 }
 
 var tree = []StudioPath{
-	{`teamskeet`, `ts_network`}, {`swappz`, `swap_bundle`}, {`freeuse`, `freeusebundle`}, {`dadcrush`, `ts_dc`}, {`pervmom`, `ts_pvm`}, {`sislovesme`, `ts_slm`}, {`mylf`, `mylf_bundle`}, {`familystrokes`, `familybundle`}, {`shoplyfter`, `ts_shl`},
+	{`teamskeet`, `ts_network`}, {`swappz`, `swap_bundle`}, {`freeuse`, `freeusebundle`}, {`dadcrush`, `ts_dc`}, {`pervmom`, `ts_pvm`}, {`sislovesme`, `ts_slm`}, {`mylf`, `mylf_bundle`}, {`familystrokes`, `familybundle`}, {`shoplyfter`, `ts_shl`}, {`pervz`, `pervbundle`},
 }
 
 func (t *teamskt) Get(index int) (list []preview.ContentResource, err error) {

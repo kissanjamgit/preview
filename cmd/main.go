@@ -12,6 +12,7 @@ import (
 	"github.com/kissanjamgit/preview/brazz"
 	"github.com/kissanjamgit/preview/config"
 	"github.com/kissanjamgit/preview/dorcel"
+	"github.com/kissanjamgit/preview/enjoyx"
 	"github.com/kissanjamgit/preview/evil"
 	"github.com/kissanjamgit/preview/hd8k"
 	"github.com/kissanjamgit/preview/littlecaprice"
@@ -33,7 +34,6 @@ import (
 ///todo
 //https://czechav.com/
 //https://enjoyx.com/?nats=MTIuMi4yLjIuMC4wLjAuMC4w
-//https://www.littlecaprice-dreams.com/videos
 //https://en.inkasex.com/videos/latest
 //https://pornbox.com/application/studio/328
 //https://pornbox.com/application/model/188419
@@ -138,6 +138,7 @@ func buildDomains() (d []Host) {
 		&Site{`private`, private.New},
 		&Site{`dorcel`, dorcel.New},
 		&Site{`littlecaprice`, littlecaprice.New},
+		&Site{`enjoyx`, enjoyx.New},
 	)
 	d = append(d, toDomainList(`newsensations`, newsens.Domain, newsens.New))
 	d = append(d, toDomainList(`allanal`, allanal.Domain, allanal.New))

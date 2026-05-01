@@ -17,6 +17,7 @@ import (
 	"github.com/kissanjamgit/preview/newsens"
 	"github.com/kissanjamgit/preview/nporn"
 	"github.com/kissanjamgit/preview/pbox"
+	"github.com/kissanjamgit/preview/private"
 	"github.com/kissanjamgit/preview/pworld"
 	smex "github.com/kissanjamgit/preview/sexmex"
 	"github.com/kissanjamgit/preview/teamskt"
@@ -134,6 +135,7 @@ func buildDomains() (d []Host) {
 		&Site{`vip4k`, vip.New},
 		&Site{`pornhd8k`, hd8k.New},
 		&Site{`nubiles`, nporn.New},
+		&Site{`private`, private.New},
 	)
 	d = append(d, toDomainList(`newsensations`, newsens.Domain, newsens.New))
 	d = append(d, toDomainList(`allanal`, allanal.Domain, allanal.New))

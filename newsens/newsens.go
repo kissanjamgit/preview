@@ -3,7 +3,6 @@ package newsens
 
 import (
 	"fmt"
-	"os"
 	"regexp"
 
 	"github.com/kissanjamgit/preview"
@@ -18,9 +17,42 @@ func New(source string) preview.Preview {
 	return &newsens{source}
 }
 
-func (*newsens) Get(index int) (list []preview.ContentResource, err error) {
+type StudioPath struct {
+	name string
+	path string
+}
+
+var tree = []StudioPath{
+	{`newsensations`, `tour_ns`},
+	{`familyxxx`, `tour_famxxx`},
+	{`hotwifexxx`, `tour_hwxxx`},
+	{`girlgirlxxx`, `tour_girlgirlxxx`},
+	{`shanedieselxxx`, `tour_sdxxx`},
+}
+
+var Domain = func() (s []string) {
+	for _, i := range tree {
+		s = append(s, i.name)
+	}
+	return
+}()
+
+func (n *newsens) Get(index int) (list []preview.ContentResource, err error) {
 	index += 1
-	uri := fmt.Sprintf(`https://www.newsensations.com/tour_ns/categories/movies_%d_d.html`, index) // 0 isn't allowed;
+	studio, err := func() (StudioPath, error) {
+		for _, s := range tree {
+			if n.Source != s.name {
+				continue
+			}
+			return s, nil
+		}
+		return StudioPath{}, fmt.Errorf("n.Source not in tree")
+	}()
+	if err != nil {
+		return
+	}
+
+	uri := fmt.Sprintf(`https://www.%s.com/%s/categories/movies_%d_d.html`, studio.name, studio.path, index) // 0 isn't allowed;
 	client := resty.New()
 	res, err := client.R().Get(uri)
 	if err != nil {
@@ -29,7 +61,6 @@ func (*newsens) Get(index int) (list []preview.ContentResource, err error) {
 	listSrc := []string{}
 	listHref := []string{}
 	submatchSrc := regexp.MustCompile(`source src="([^"]+)"`).FindAllStringSubmatch(res.String(), -1)
-	os.WriteFile(`content.html`, res.Bytes(), 0o677)
 	for _, m := range submatchSrc {
 		if len(m) < 2 {
 			continue

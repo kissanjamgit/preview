@@ -29,7 +29,6 @@ import (
 
 ///todo
 //https://czechav.com/
-//https://www.newsensations.com/tour_ns/categories/movies_2_d.html
 //https://www.private.com/scene/blake-blossom-fucks-another-guy-right-in-front-of-her-husband/27134
 //https://www.dorcelclub.com/en/news-videos-x-marc-dorcel?sorting=new
 //https://enjoyx.com/?nats=MTIuMi4yLjIuMC4wLjAuMC4w
@@ -135,8 +134,8 @@ func buildDomains() (d []Host) {
 		&Site{`vip4k`, vip.New},
 		&Site{`pornhd8k`, hd8k.New},
 		&Site{`nubiles`, nporn.New},
-		&Site{`newsense`, newsens.New},
 	)
+	d = append(d, toDomainList(`newsensations`, newsens.Domain, newsens.New))
 	d = append(d, toDomainList(`allanal`, allanal.Domain, allanal.New))
 	d = append(d, toDomainList(`evilangel`, evil.Domain, evil.New))
 	return

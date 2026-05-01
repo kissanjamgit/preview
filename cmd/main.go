@@ -8,6 +8,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/kissanjamgit/preview/allanal"
 	"github.com/kissanjamgit/preview/brazz"
 	"github.com/kissanjamgit/preview/config"
 	"github.com/kissanjamgit/preview/evil"
@@ -26,21 +27,11 @@ import (
 )
 
 ///todo
+//https://tour.allanal.com/?nats=MC4wLjUuNS4wLjAuMC4wLjA&switched=1&strack=1&amp%3Bstrack=1
 //https://en.inkasex.com/videos/latest
 //https://pornbox.com/application/studio/328
 //https://pornbox.com/application/model/188419
-//https://www.moderndaysins.com/en/video/moderndaysins/One-Bed-Two-In-Laws/261172
 ///
-
-// func domainList() (l []string) {
-// 	l = append(l, brazz.Domain...)
-// 	l = append(l, pbox.Domain...)
-// 	l = append(l, "teamskeet")
-// 	l = append(l, "pornworld")
-// 	l = append(l, "sexmex")
-//
-// 	return
-// }
 
 type Host interface {
 	Name() string
@@ -74,57 +65,57 @@ func toDomainList(name string, list []string, f func(string) preview.Preview) (d
 	return
 }
 
-func run() (pr []preview.ContentResource, err error) {
-	// input := flag.Int("i", 0, "select the provider")
-	// search := flag.String("search", "", "search for preview")
-	// index := flag.Int("index", 0, "index")
-	// help := flag.Bool("h", false, "print help text")
-	// flag.Parse()
+// func run() (pr []preview.ContentResource, err error) {
+// input := flag.Int("i", 0, "select the provider")
+// search := flag.String("search", "", "search for preview")
+// index := flag.Int("index", 0, "index")
+// help := flag.Bool("h", false, "print help text")
+// flag.Parse()
 
-	// var domain []Domain
-	// domain = append(domain, toDomainList(brazz.Domain, brazz.New)...)
-	// domain = append(domain, toDomainList(pbox.Domain, pbox.New)...)
-	// domain = append(domain, Domain{`teamskeet`, teamskt.New})
-	// domain = append(domain, Domain{`pornworld`, pworld.New})
-	// domain = append(domain, Domain{`sexmex`, smex.New})
-	// domain = append(domain, Domain{`vip4k`, vip.New})
-	// domain = append(domain, Domain{`pornhd8k`, hd8k.New})
+// var domain []Domain
+// domain = append(domain, toDomainList(brazz.Domain, brazz.New)...)
+// domain = append(domain, toDomainList(pbox.Domain, pbox.New)...)
+// domain = append(domain, Domain{`teamskeet`, teamskt.New})
+// domain = append(domain, Domain{`pornworld`, pworld.New})
+// domain = append(domain, Domain{`sexmex`, smex.New})
+// domain = append(domain, Domain{`vip4k`, vip.New})
+// domain = append(domain, Domain{`pornhd8k`, hd8k.New})
 
-	// if *search != "" {
-	// 	var hostname string
-	// 	if uri, err := url.Parse(*search); err != nil && uri.Hostname() != `` {
-	// 		return nil, err
-	// 	} else {
-	// 		hostname = uri.Hostname()
-	// 	}
-	//
-	// 	switch {
-	// 	case strings.Contains(hostname, `manyvids`):
-	// 		m := manyv.New(*search)
-	// 		return m.Search(*index)
-	// 	default:
-	// 		return nil, fmt.Errorf("switch case exhausted")
-	//
-	// 	}
-	// }
+// if *search != "" {
+// 	var hostname string
+// 	if uri, err := url.Parse(*search); err != nil && uri.Hostname() != `` {
+// 		return nil, err
+// 	} else {
+// 		hostname = uri.Hostname()
+// 	}
+//
+// 	switch {
+// 	case strings.Contains(hostname, `manyvids`):
+// 		m := manyv.New(*search)
+// 		return m.Search(*index)
+// 	default:
+// 		return nil, fmt.Errorf("switch case exhausted")
+//
+// 	}
+// }
 
-	// if *help || *input == -1 {
-	// 	var buff strings.Builder
-	// 	for i, d := range domain {
-	// 		fmt.Fprintf(&buff, "%2d: %s\n", i, d.domain)
-	// 	}
-	// 	fmt.Println(buff.String())
-	// 	return nil, nil
-	// }
+// if *help || *input == -1 {
+// 	var buff strings.Builder
+// 	for i, d := range domain {
+// 		fmt.Fprintf(&buff, "%2d: %s\n", i, d.domain)
+// 	}
+// 	fmt.Println(buff.String())
+// 	return nil, nil
+// }
 
-	// str := domain[*input].domain
-	// pr, err = domainMap()[str](str).Get(*index)
-	// if err != nil {
-	// 	fmt.Println(err)
-	// 	os.Exit(1)
-	// }
-	return
-}
+// str := domain[*input].domain
+// pr, err = domainMap()[str](str).Get(*index)
+// if err != nil {
+// 	fmt.Println(err)
+// 	os.Exit(1)
+// }
+// 	return
+// }
 
 var hostList = buildDomains()
 
@@ -139,6 +130,7 @@ func buildDomains() (d []Host) {
 		&Site{`pornhd8k`, hd8k.New},
 		&Site{`nubiles`, nporn.New},
 	)
+	d = append(d, toDomainList(`allanal`, allanal.Domain, allanal.New))
 	d = append(d, toDomainList(`evilangel`, evil.Domain, evil.New))
 	return
 }

@@ -35,9 +35,11 @@ var header = map[string]string{
 }
 
 func (s *Lifese) Resource(client *resty.Client) (cr ext.ContentResource, err error) {
-	// /game/DisplayPlayer/gameId/87789
-	ID := regexp.MustCompile(`gameId/\d+`).FindString(s.source)
-	URI := fmt.Sprintf(`https://lifeselector.com/game/trailer/gameId/%s/ext/file.mp4`, ID)
+	submatchID := regexp.MustCompile(`gameId/(\d+)`).FindStringSubmatch(s.source)
+	if len(submatchID) < 1 {
+		return
+	}
+	URI := fmt.Sprintf(`https://lifeselector.com/game/trailer/gameId/%s/ext/file.mp4`, submatchID[1])
 	res, err := client.R().SetHeaders(header).Get(s.source)
 	if err != nil {
 		return

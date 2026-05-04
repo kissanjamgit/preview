@@ -21,16 +21,17 @@ func New(source string) preview.Preview {
 
 var size = 12
 
-var baseURL = "https://nubiles-porn.com"
+var Domain = []string{`nubiles-porn`, `shesbreedingmaterial`, `realitysis`, `caughtmycoach`, `cheatingsis`, `cumswappingsis`, `cumswappingsis`, `myfamilypies`, `stepsiblingscaught`, `familyswap`, `momsteachsex`}
 
 func (n *nporn) Get(index int) (list []preview.ContentResource, err error) {
 	client := resty.New()
+	baseURL := `https://` + n.Source + `.com`
 	uri := fmt.Sprintf("%s/video/gallery/%d", baseURL, size*index)
 	res, err := client.R().Get(uri)
 	if err != nil {
 		return
 	}
-	submatch := regexp.MustCompile(`<a href="(/video/watch[^"]+)">\s*<div class="overlay-video-wrapper hover-thumb cover" data-preview-src="([^"]+)"`).FindAllStringSubmatch(res.String(), -1)
+	submatch := regexp.MustCompile(`<a href="(/video/watch[^"]+)">\s*<div[^>]*data-preview-src="([^"]+)"`).FindAllStringSubmatch(res.String(), -1)
 	for _, item := range submatch {
 		if len(item) < 3 {
 			continue

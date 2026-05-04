@@ -136,13 +136,13 @@ func buildDomains() (d []Host) {
 		&Site{`sexmex`, smex.New},
 		&Site{`vip4k`, vip.New},
 		&Site{`pornhd8k`, hd8k.New},
-		&Site{`nubiles`, nporn.New},
 		&Site{`private`, private.New},
 		&Site{`dorcel`, dorcel.New},
 		&Site{`littlecaprice`, littlecaprice.New},
 		&Site{`enjoyx`, enjoyx.New},
 		&Site{`lifese`, lifese.New},
 	)
+	d = append(d, toDomainList(`nubiles`, nporn.Domain, nporn.New))
 	d = append(d, toDomainList(`familytherapyxxx`, ftherapy.Domain, ftherapy.New))
 	d = append(d, toDomainList(`czechav`, czechav.Domain, czechav.New))
 	d = append(d, toDomainList(`newsensations`, newsens.Domain, newsens.New))

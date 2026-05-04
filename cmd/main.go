@@ -17,6 +17,7 @@ import (
 	"github.com/kissanjamgit/preview/evil"
 	"github.com/kissanjamgit/preview/ftherapy"
 	"github.com/kissanjamgit/preview/hd8k"
+	"github.com/kissanjamgit/preview/hhshot"
 	"github.com/kissanjamgit/preview/lifese"
 	"github.com/kissanjamgit/preview/littlecaprice"
 	"github.com/kissanjamgit/preview/manyv"
@@ -147,6 +148,8 @@ func buildDomains() (d []Host) {
 	d = append(d, toDomainList(`newsensations`, newsens.Domain, newsens.New))
 	d = append(d, toDomainList(`allanal`, allanal.Domain, allanal.New))
 	d = append(d, toDomainList(`evilangel`, evil.Domain, evil.New))
+
+	d = append(d, &Site{`hhshot`, hhshot.New})
 	return
 }
 

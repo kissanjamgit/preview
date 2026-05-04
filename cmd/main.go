@@ -17,6 +17,7 @@ import (
 	"github.com/kissanjamgit/preview/evil"
 	"github.com/kissanjamgit/preview/ftherapy"
 	"github.com/kissanjamgit/preview/hd8k"
+	"github.com/kissanjamgit/preview/lifese"
 	"github.com/kissanjamgit/preview/littlecaprice"
 	"github.com/kissanjamgit/preview/manyv"
 	"github.com/kissanjamgit/preview/newsens"
@@ -139,6 +140,7 @@ func buildDomains() (d []Host) {
 		&Site{`dorcel`, dorcel.New},
 		&Site{`littlecaprice`, littlecaprice.New},
 		&Site{`enjoyx`, enjoyx.New},
+		&Site{`lifese`, lifese.New},
 	)
 	d = append(d, toDomainList(`familytherapyxxx`, ftherapy.Domain, ftherapy.New))
 	d = append(d, toDomainList(`czechav`, czechav.Domain, czechav.New))

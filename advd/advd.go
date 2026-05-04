@@ -4,7 +4,6 @@ package advd
 import (
 	"fmt"
 	"net/url"
-	"os"
 	"os/exec"
 	"regexp"
 	"strings"
@@ -27,6 +26,11 @@ func New(source string) ext.Site {
 	return &Advd{Source: source}
 }
 
+func singleSpace(str string) string {
+	str = strings.TrimSpace(str)
+	return regexp.MustCompile(`\s+`).ReplaceAllString(str, " ")
+}
+
 func clip(a *Advd, client *resty.Client, ID string) (cr ext.ContentResource, err error) {
 	res, err := client.R().SetHeader("Cookie", "ageConfirmed=true; defaults={}").Get(a.Source)
 	if err != nil {
@@ -34,13 +38,12 @@ func clip(a *Advd, client *resty.Client, ID string) (cr ext.ContentResource, err
 	}
 
 	// submatch := regexp.MustCompile(`<link rel="alternate" type="[^"]" title="([^"]+)" href="([^"])"`).FindStringSubmatch(res.String())
-	os.WriteFile("content.html", res.Bytes(), 0o644)
-	submatch := regexp.MustCompile(`<h1 class="clip-page__detail__title__primary">([^<]*)</h1>`).FindStringSubmatch(res.String())
+	submatch := regexp.MustCompile(`<h1[^>]*>([^<]*)`).FindStringSubmatch(res.String())
 	if len(submatch) < 2 {
 		err = fmt.Errorf("(clip) `len(submatch) < 3`")
 		return
 	}
-	name := submatch[1]
+	name := singleSpace(submatch[1])
 	submatch = regexp.MustCompile(`<iframe frameborder="0"[^>]+src="([^"]*)"`).FindStringSubmatch(res.String())
 	if len(submatch) < 2 {
 		err = fmt.Errorf("(clip) `len(submatch) < 2`")
@@ -64,12 +67,12 @@ func movie(a *Advd, client *resty.Client, ID string) (cr ext.ContentResource, er
 	if err != nil {
 		return
 	}
-	submatch := regexp.MustCompile(`<h1[^>]+>([^<]*)</h1>`).FindSubmatch(res.Bytes())
+	submatch := regexp.MustCompile(`<h1[^>]*>([^<]*)`).FindStringSubmatch(res.String())
 	if len(submatch) < 2 {
 		err = fmt.Errorf("(movie) `len(submatch) < 2`")
 		return
 	}
-	name := strings.TrimSpace(string(submatch[1]))
+	name := singleSpace(submatch[1])
 	if submatch := regexp.MustCompile(`Label="Studio">([^<]+)</a>`).FindStringSubmatch(res.String()); len(submatch) == 2 {
 		name = name + " - " + submatch[1]
 	}
@@ -78,14 +81,14 @@ func movie(a *Advd, client *resty.Client, ID string) (cr ext.ContentResource, er
 }
 
 func (a *Advd) Resource(client *resty.Client) (cr ext.ContentResource, err error) {
-	if submatch := regexp.MustCompile("/clip/([0-9]+)/").FindStringSubmatch(a.Source); len(submatch) > 0 {
+	if submatch := regexp.MustCompile(`/clip/(\d+)/`).FindStringSubmatch(a.Source); len(submatch) > 0 {
 		if len(submatch) < 2 {
 			err = fmt.Errorf("(Resource) `len(submatch) < 2`")
 			return
 		}
 		cr, err = clip(a, client, submatch[1])
 		return
-	} else if match := regexp.MustCompile("[0-9]+").FindString(a.Source); match != "" {
+	} else if match := regexp.MustCompile(`\d+`).FindString(a.Source); match != "" {
 		cr, err = movie(a, client, match)
 		return
 	}

@@ -1,4 +1,4 @@
-// package Vidara provides a wrapper for vidara.so
+// Package vidara provides a wrapper for vidara.so
 package vidara
 
 import (
@@ -33,11 +33,13 @@ func (v *Vidara) Resource(client *resty.Client) (cr ext.ContentResource, err err
 	} else {
 		ID = l[len(l)-1]
 	}
-
-	res, err := client.R().Get(fmt.Sprintf("https://vidara.so/api/stream?filecode=%s", ID))
+	body := fmt.Sprintf(`{"filecode":"%s","device":"web"}`, ID)
+	res, err := client.R().SetBody(body).
+		Post("https://vidara.so/api/stream")
 	if err != nil {
 		return
 	}
+	os.WriteFile(`content.json`, res.Bytes(), 0o644)
 	var data jsonParse
 	err = json.Unmarshal(res.Bytes(), &data)
 	if err != nil {

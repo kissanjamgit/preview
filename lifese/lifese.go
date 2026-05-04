@@ -3,6 +3,7 @@ package lifese
 
 import (
 	"fmt"
+	"os/exec"
 	"regexp"
 
 	"github.com/kissanjamgit/ext"
@@ -34,6 +35,8 @@ var header = map[string]string{
 	"TE":                        "trailers",
 }
 
+// Resource Note cr.URL for lifese is a redirect it requres to have header "TE:trailers"
+// add this for mpvnet to work with it "ytdl-raw-options=extractor-args=add-headers=TE:trailers" //this shorter form of the value which is not been tested
 func (s *Lifese) Resource(client *resty.Client) (cr ext.ContentResource, err error) {
 	submatchID := regexp.MustCompile(`gameId/(\d+)`).FindStringSubmatch(s.source)
 	if len(submatchID) < 1 {
@@ -54,5 +57,7 @@ func (s *Lifese) Resource(client *resty.Client) (cr ext.ContentResource, err err
 }
 
 func (s *Lifese) Download(cr ext.ContentResource) (err error) {
+	cmd := exec.Command("yt-dlp.exe", cr.URL, "-o", cr.Name+".mp4", "--add-header", "TE:trailers", "--extractor-args", "generic:impersonate")
+	err = cmd.Run()
 	return
 }

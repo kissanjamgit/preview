@@ -2,11 +2,13 @@
 package lifese
 
 import (
+	"encoding/json"
 	"fmt"
 	"os/exec"
 	"regexp"
 
 	"github.com/kissanjamgit/ext"
+	"golang.org/x/sync/errgroup"
 	"resty.dev/v3"
 )
 
@@ -35,24 +37,52 @@ var header = map[string]string{
 	"TE":                        "trailers",
 }
 
+type jsonAdapte struct {
+	Resource struct {
+		Content string `json:"content"`
+	} `json:"resource"`
+}
+
 // Resource Note cr.URL for lifese is a redirect it requres to have header "TE:trailers"
 // add this for mpvnet to work with it "ytdl-raw-options=extractor-args=add-headers=TE:trailers" //this shorter form of the value which is not been tested
+
 func (s *Lifese) Resource(client *resty.Client) (cr ext.ContentResource, err error) {
 	submatchID := regexp.MustCompile(`gameId/(\d+)`).FindStringSubmatch(s.source)
-	if len(submatchID) < 1 {
+	if len(submatchID) < 2 {
 		return
 	}
-	URI := fmt.Sprintf(`https://lifeselector.com/game/trailer/gameId/%s/ext/file.mp4`, submatchID[1])
-	res, err := client.R().SetHeaders(header).Get(s.source)
+
+	var name string
+	g := errgroup.Group{}
+	g.Go(func() (err error) {
+		res, err := client.R().SetHeaders(header).Get(s.source)
+		if err != nil {
+			return
+		}
+		submatch := regexp.MustCompile(`<h1 class="title">([^<]+)</h1>`).FindStringSubmatch(res.String())
+		if len(submatch) < 2 {
+			err = fmt.Errorf("len(submatch) < 2 ")
+			return
+		}
+		name = submatch[1]
+		return
+	})
+
+	URI := fmt.Sprintf(`https://lifeselector.com/game/GetEpisodeDetailsInJson/gameId/%s/choiceId/0`, submatchID[1])
+	res, err := client.R().SetHeaders(header).Get(URI)
 	if err != nil {
 		return
 	}
-	submatch := regexp.MustCompile(`<h1 class="title">([^<]+)</h1>`).FindStringSubmatch(res.String())
-	if len(submatch) < 1 {
-		err = fmt.Errorf("submatch len < 1")
+	var ja jsonAdapte
+	err = json.Unmarshal(res.Bytes(), &ja)
+	if err != nil {
 		return
 	}
-	cr = ext.ContentResource{Name: submatch[1], URL: URI}
+	err = g.Wait()
+	if err != nil {
+		return
+	}
+	cr = ext.ContentResource{Name: name, URL: ja.Resource.Content}
 	return
 }
 

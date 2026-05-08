@@ -29,6 +29,7 @@ import (
 	smex "github.com/kissanjamgit/preview/sexmex"
 	"github.com/kissanjamgit/preview/teamskt"
 	"github.com/kissanjamgit/preview/vip"
+	"github.com/kissanjamgit/preview/xp"
 
 	"github.com/kissanjamgit/preview"
 
@@ -150,6 +151,7 @@ func buildDomains() (d []Host) {
 	d = append(d, toDomainList(`evilangel`, evil.Domain, evil.New))
 
 	d = append(d, &Site{`hhshot`, hhshot.New})
+	d = append(d, &Site{`xp`, xp.New})
 	return
 }
 

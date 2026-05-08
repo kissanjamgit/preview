@@ -14,7 +14,7 @@ import (
 	"resty.dev/v3"
 )
 
-var Domain = []string{`brazzers`, `milfed`, `bangbros`, `realitykings`, `twistys`, `digitalplayground`, `mofos`, `letsdoeit`}
+var Domain = []string{`brazzers`, `milfed`, `bangbros`, `realitykings`, `twistys`, `digitalplayground`, `mofos`, `letsdoeit`, `mypervyfamily`}
 
 type Brazz struct {
 	Source string
@@ -64,6 +64,7 @@ var sceneOrVideo = map[string]bool{
 	"realitykings":      true,
 	"digitalplayground": true,
 	`letsdoeit`:         true,
+	`mypervyfamily`:     false,
 }
 
 var (

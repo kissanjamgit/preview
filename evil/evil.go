@@ -21,7 +21,7 @@ func New(source string) preview.Preview {
 	return &evil{source}
 }
 
-var Domain = []string{`evilangel`, `moderndaysins`, `devilsfilm`, `puretaboo`, `mommysboy`, `mommysgirl`, `girlsway`, `21sextury`, `outofthefamily`, `tabooheat`, `accidentalgangbang`, `mommyblowsbest`, `nurumassage`, `filthykings`, `dogfartnetwork`, `gangbangcreampie`}
+var Domain = []string{`evilangel`, `moderndaysins`, `devilsfilm`, `puretaboo`, `mommysboy`, `mommysgirl`, `girlsway`, `21sextury`, `outofthefamily`, `tabooheat`, `accidentalgangbang`, `mommyblowsbest`, `nurumassage`, `filthykings`, `dogfartnetwork`, `gangbangcreampie`, `filthykings`}
 
 type devilsfilmAPIEnv struct {
 	API struct {

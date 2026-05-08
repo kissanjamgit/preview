@@ -63,6 +63,7 @@ var sceneOrVideo = map[string]bool{
 	"twistys":           true,
 	"realitykings":      true,
 	"digitalplayground": true,
+	`letsdoeit`:         true,
 }
 
 var (

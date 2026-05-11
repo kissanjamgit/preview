@@ -20,6 +20,7 @@ func New(source string) preview.Preview {
 var baseURL = `https://www.adultdvdempire.com`
 
 func (a *advd) Get(index int) (list []preview.ContentResource, err error) {
+	index += 1
 	uri := fmt.Sprintf(`%s/clips/?page=%d`, baseURL, index)
 	client := resty.New()
 	res, err := client.R().SetHeader("Cookie", "ageConfirmed=true; defaults={}").Get(uri)

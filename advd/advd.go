@@ -17,7 +17,10 @@ func New(source string) preview.Preview {
 	return &advd{source: source}
 }
 
-var baseURL = `https://www.adultdvdempire.com`
+var (
+	baseURL = `https://www.adultdvdempire.com`
+	viewFmt = `https://video.adultempire.com/hls/previewscene/%s/%s/index-f2-v1-a1.m3u8`
+)
 
 func (a *advd) Get(index int) (list []preview.ContentResource, err error) {
 	index += 1
@@ -41,7 +44,7 @@ func (a *advd) Get(index int) (list []preview.ContentResource, err error) {
 		if len(matchHref) < 2 {
 			continue
 		}
-		view := fmt.Sprintf(`https://video.adultempire.com/hls/previewscene/%s/%s/index-f1-v1.m3u8`, v[2], v[1])
+		view := fmt.Sprintf(viewFmt, v[2], v[1])
 		list = append(list, preview.ContentResource{Source: baseURL + matchHref[1], View: view})
 	}
 

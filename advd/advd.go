@@ -3,7 +3,6 @@ package advd
 
 import (
 	"fmt"
-	"os"
 	"regexp"
 
 	"github.com/kissanjamgit/preview"
@@ -27,7 +26,6 @@ func (a *advd) Get(index int) (list []preview.ContentResource, err error) {
 	if err != nil {
 		return
 	}
-	os.WriteFile(`content.html`, res.Bytes(), 0o644)
 	submatchData := regexp.MustCompile(`data-scene-id="(\d+)"\s*data-movie-id="(\d+)"`).FindAllStringSubmatch(res.String(), -1)
 	submatchHref := regexp.MustCompile(`href='([^"]+)' data-ta="view" `).FindAllStringSubmatch(res.String(), -1)
 	if len(submatchData) != len(submatchHref) {

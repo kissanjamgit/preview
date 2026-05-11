@@ -8,6 +8,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/kissanjamgit/preview/advd"
 	"github.com/kissanjamgit/preview/allanal"
 	"github.com/kissanjamgit/preview/blacked"
 	"github.com/kissanjamgit/preview/brazz"
@@ -154,6 +155,7 @@ func buildDomains() (d []Host) {
 	d = append(d, toDomainList(`hhshot`, hhshot.Domain, hhshot.New))
 	d = append(d, &Site{`xp`, xp.New})
 	d = append(d, toDomainList(`blacked`, blacked.Domain, blacked.New))
+	d = append(d, &Site{`advd`, advd.New})
 	return
 }
 

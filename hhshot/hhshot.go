@@ -3,7 +3,6 @@ package hhshot
 
 import (
 	"fmt"
-	"os"
 	"regexp"
 
 	"github.com/kissanjamgit/preview"
@@ -18,20 +17,44 @@ func New(source string) preview.Preview {
 	return &hhshot{source: source}
 }
 
-var baseURL = `https://hookuphotshot.com`
+type siteConfig struct {
+	host      string
+	route     string
+	sourceFmt string
+}
+
+var path = []siteConfig{{`hookuphotshot`, `https://hookuphotshot.com/nn/categories/movies/%d/latest/`, `https://hookuphotshot.com%s`}, {`missax`, `https://missax.com/tour/categories/movies_%d_d.html`, `%s`}}
+
+var Domain = func() (list []string) {
+	for _, p := range path {
+		list = append(list, p.host)
+	}
+	return
+}()
 
 func (p *hhshot) Get(index int) (list []preview.ContentResource, err error) {
+	config, err := func() (siteConfig, error) {
+		for _, r := range path {
+			if r.host != p.source {
+				continue
+			}
+			return r, nil
+		}
+		return siteConfig{}, fmt.Errorf("route not found")
+	}()
+	if err != nil {
+		return
+	}
 	client := resty.New()
 	defer client.Close()
-	URI := fmt.Sprintf(`%s/nn/categories/movies/%d/latest/`, baseURL, index)
+	URI := fmt.Sprintf(config.route, index)
 	res, err := client.R().Get(URI)
-	os.WriteFile(`content.html`, res.Bytes(), 0o777)
 	if err != nil {
 		return
 	}
 	submatch := regexp.MustCompile(`<a href="([^"]+)"[^>]*>\s*<img[^>]*src0_1x="([^"]+)"`).FindAllStringSubmatch(res.String(), -1)
 	for _, m := range submatch {
-		list = append(list, preview.ContentResource{Source: m[1], View: baseURL + m[2]})
+		list = append(list, preview.ContentResource{Source: m[1], View: fmt.Sprintf(config.sourceFmt, m[2])})
 	}
 	return
 }

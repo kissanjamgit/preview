@@ -151,7 +151,7 @@ func buildDomains() (d []Host) {
 	d = append(d, toDomainList(`allanal`, allanal.Domain, allanal.New))
 	d = append(d, toDomainList(`evilangel`, evil.Domain, evil.New))
 
-	d = append(d, &Site{`hhshot`, hhshot.New})
+	d = append(d, toDomainList(`hhshot`, hhshot.Domain, hhshot.New))
 	d = append(d, &Site{`xp`, xp.New})
 	d = append(d, toDomainList(`blacked`, blacked.Domain, blacked.New))
 	return

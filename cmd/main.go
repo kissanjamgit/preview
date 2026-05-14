@@ -10,6 +10,7 @@ import (
 
 	"github.com/kissanjamgit/preview/advd"
 	"github.com/kissanjamgit/preview/allanal"
+	"github.com/kissanjamgit/preview/aziani"
 	"github.com/kissanjamgit/preview/blacked"
 	"github.com/kissanjamgit/preview/brazz"
 	"github.com/kissanjamgit/preview/config"
@@ -40,6 +41,8 @@ import (
 
 ///todo
 //https://en.inkasex.com/videos/latest
+//https://aziani.com/
+//https://bukkake.to/
 //https://pornbox.com/application/studio/328
 //https://pornbox.com/application/model/188419
 ///
@@ -156,6 +159,7 @@ func buildDomains() (d []Host) {
 	d = append(d, &Site{`xp`, xp.New})
 	d = append(d, toDomainList(`blacked`, blacked.Domain, blacked.New))
 	d = append(d, toDomainList(`advd`, advd.Domain, advd.New))
+	d = append(d, &Site{`aziani`, aziani.New})
 	return
 }
 

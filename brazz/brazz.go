@@ -14,7 +14,7 @@ import (
 	"resty.dev/v3"
 )
 
-var Domain = []string{`brazzers`, `milfed`, `bangbros`, `realitykings`, `twistys`, `digitalplayground`, `mofos`, `letsdoeit`, `mypervyfamily`}
+var Domain = []string{`brazzers`, `milfed`, `bangbros`, `realitykings`, `twistys`, `digitalplayground`, `mofos`, `letsdoeit`, `mypervyfamily`, `deviante`}
 
 type Brazz struct {
 	Source string

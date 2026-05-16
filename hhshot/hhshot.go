@@ -13,8 +13,16 @@ type hhshot struct {
 	source string
 }
 
-func New(source string) preview.Preview {
-	return &hhshot{source: source}
+func (h hhshot) Name() string {
+	return "hhshot"
+}
+
+func (h *hhshot) SetSource(source string) {
+	h.source = source
+}
+
+func New() *hhshot {
+	return &hhshot{}
 }
 
 type siteConfig struct {
@@ -32,7 +40,7 @@ var Domain = func() (list []string) {
 	return
 }()
 
-func (p *hhshot) Get(index int) (list []preview.ContentResource, err error) {
+func (p hhshot) Get(index int) (list []preview.ContentResource, err error) {
 	config, err := func() (siteConfig, error) {
 		for _, r := range path {
 			if r.host != p.source {

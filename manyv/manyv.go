@@ -30,7 +30,7 @@ func New(source string) *Manyv {
 	return &Manyv{source}
 }
 
-func (m *Manyv) Search(index int) (list []pr.ContentResource, err error) {
+func (m Manyv) Search(index int) (list []pr.ContentResource, err error) {
 	if index <= 0 {
 		index = 1
 	}

@@ -14,7 +14,11 @@ type Smex struct {
 	source string
 }
 
-func (s *Smex) Get(index int) (pr []preview.ContentResource, err error) {
+func (s *Smex) SetSource(source string) {
+	s.source = source
+}
+
+func (s Smex) Get(index int) (pr []preview.ContentResource, err error) {
 	client := resty.New().R()
 	res, err := client.Get("https://sexmex.xxx/tour/categories/movies.html")
 	if err != nil {
@@ -43,6 +47,10 @@ func (s *Smex) Get(index int) (pr []preview.ContentResource, err error) {
 	return
 }
 
-func New(source string) preview.Preview {
-	return &Smex{source}
+func (s Smex) Name() string {
+	return "sexmex"
+}
+
+func New() *Smex {
+	return &Smex{}
 }

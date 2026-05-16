@@ -12,13 +12,21 @@ type littlecaprice struct {
 	source string
 }
 
-func New(source string) preview.Preview {
-	return &littlecaprice{source}
+func (l littlecaprice) Name() string {
+	return "littlecaprice"
+}
+
+func (l *littlecaprice) SetSource(source string) {
+	l.source = source
+}
+
+func New() *littlecaprice {
+	return &littlecaprice{}
 }
 
 var size = 30
 
-func (l *littlecaprice) Get(index int) (list []preview.ContentResource, err error) {
+func (l littlecaprice) Get(index int) (list []preview.ContentResource, err error) {
 	index += 1
 	uri := `https://www.littlecaprice-dreams.com/videos`
 	client := resty.New()

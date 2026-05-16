@@ -14,8 +14,16 @@ type ftherapy struct {
 	source string
 }
 
-func New(source string) preview.Preview {
-	return &ftherapy{source}
+func (f *ftherapy) SetSource(source string) {
+	f.source = source
+}
+
+func (f ftherapy) Name() string {
+	return "ftherapy"
+}
+
+func New() *ftherapy {
+	return &ftherapy{}
 }
 
 var Domain = []string{`familytherapyxxx`, `momcomesfirst`, `cockninjastudios`, `perfectgirlfriend`, `analtherapyxxx`, `wifelovesblack`, `teenlovesblack`}
@@ -36,7 +44,7 @@ var tree = []pathConv{
 	{`teenlovesblack`, `-thumb\.[a-z]+`, `_trailer.mp4`},
 }
 
-func (f *ftherapy) Get(index int) (pr []preview.ContentResource, err error) {
+func (f ftherapy) Get(index int) (pr []preview.ContentResource, err error) {
 	sp, err := func() (pathConv, error) {
 		for _, i := range tree {
 			if i.name != f.source {

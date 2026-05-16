@@ -13,13 +13,21 @@ type xp struct {
 	source string
 }
 
-func New(source string) preview.Preview {
-	return &xp{source}
+func (x xp) Name() string {
+	return "xp"
+}
+
+func (x *xp) SetSource(source string) {
+	x.source = source
+}
+
+func New() *xp {
+	return &xp{}
 }
 
 var baseURL = `https://pornxp.ph`
 
-func (x *xp) Get(index int) (list []preview.ContentResource, err error) {
+func (x xp) Get(index int) (list []preview.ContentResource, err error) {
 	index += 1
 	uri := fmt.Sprintf(`%s/?page=%d`, baseURL, index)
 	client := resty.New()

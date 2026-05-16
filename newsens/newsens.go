@@ -13,8 +13,16 @@ type newsens struct {
 	Source string
 }
 
-func New(source string) preview.Preview {
-	return &newsens{source}
+func (n *newsens) SetSource(source string) {
+	n.Source = source
+}
+
+func (n newsens) Name() string {
+	return "newsenss"
+}
+
+func New() *newsens {
+	return &newsens{}
 }
 
 type StudioPath struct {
@@ -37,7 +45,7 @@ var Domain = func() (s []string) {
 	return
 }()
 
-func (n *newsens) Get(index int) (list []preview.ContentResource, err error) {
+func (n newsens) Get(index int) (list []preview.ContentResource, err error) {
 	index += 1
 	studio, err := func() (StudioPath, error) {
 		for _, s := range tree {

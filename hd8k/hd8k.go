@@ -16,11 +16,19 @@ type HD8k struct {
 
 var domain = "https://en8.pornhd8k.me"
 
-func New(source string) preview.Preview {
-	return &HD8k{source: source}
+func (h HD8k) Name() string {
+	return "hd8k"
 }
 
-func (p *HD8k) Get(index int) (pr []preview.ContentResource, err error) {
+func (h *HD8k) SetSource(source string) {
+	h.source = source
+}
+
+func New() *HD8k {
+	return &HD8k{}
+}
+
+func (h HD8k) Get(index int) (pr []preview.ContentResource, err error) {
 	if index <= 0 {
 		index = 1
 	}

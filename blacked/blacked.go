@@ -14,8 +14,16 @@ type Blacked struct {
 	Source string
 }
 
-func New(source string) preview.Preview {
-	return &Blacked{source}
+func (b Blacked) Name() string {
+	return "blacked"
+}
+
+func (b *Blacked) SetSource(source string) {
+	b.Source = source
+}
+
+func New() *Blacked {
+	return &Blacked{}
 }
 
 type JSONAdapte struct {
@@ -52,7 +60,7 @@ var header = map[string]string{
 	`Priority`:                  `u=0, i`,
 }
 
-func (b *Blacked) Get(index int) (list []preview.ContentResource, err error) {
+func (b Blacked) Get(index int) (list []preview.ContentResource, err error) {
 	index += 1
 	baseURL := fmt.Sprintf(`https://www.%s.com`, b.Source)
 	uri := fmt.Sprintf(`%s/videos?page=%d`, baseURL, index)

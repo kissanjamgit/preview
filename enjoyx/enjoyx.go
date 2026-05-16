@@ -13,11 +13,19 @@ type enjoyx struct {
 	Source string
 }
 
-func New(source string) preview.Preview {
-	return &enjoyx{source}
+func (e enjoyx) Name() string {
+	return "enjoyx"
 }
 
-func (e *enjoyx) Get(index int) (list []preview.ContentResource, err error) {
+func (e *enjoyx) SetSource(source string) {
+	e.Source = source
+}
+
+func New() *enjoyx {
+	return &enjoyx{}
+}
+
+func (e enjoyx) Get(index int) (list []preview.ContentResource, err error) {
 	index += 1
 	uri := fmt.Sprintf(`https://enjoyx.com/video?page=%d`, index)
 	client := resty.New()

@@ -16,8 +16,16 @@ type lifese struct {
 	source string
 }
 
-func New(source string) preview.Preview {
-	return &lifese{source}
+func (life lifese) Name() string {
+	return "lifese"
+}
+
+func (life *lifese) SetSource(source string) {
+	life.source = source
+}
+
+func New() *lifese {
+	return &lifese{}
 }
 
 var header = map[string]string{
@@ -39,7 +47,7 @@ var header = map[string]string{
 
 var size = 21
 
-func (life *lifese) Get(index int) (list []preview.ContentResource, err error) {
+func (life lifese) Get(index int) (list []preview.ContentResource, err error) {
 	URI := url.URL{
 		Scheme: "https",
 		Host:   "lifeselector.com",

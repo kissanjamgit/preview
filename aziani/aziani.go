@@ -13,8 +13,16 @@ type Aziani struct {
 	source string
 }
 
-func New(source string) preview.Preview {
-	return &Aziani{source}
+func (a Aziani) Name() string {
+	return "aziani"
+}
+
+func (a *Aziani) SetSource(source string) {
+	a.source = source
+}
+
+func New() *Aziani {
+	return &Aziani{}
 }
 
 var header = map[string]string{
@@ -70,7 +78,7 @@ var (
 	viewFmt   = `%s%s?%s`
 )
 
-func (a *Aziani) Get(index int) (list []preview.ContentResource, err error) {
+func (a Aziani) Get(index int) (list []preview.ContentResource, err error) {
 	uri := fmt.Sprintf(`%s/tour_api.php/content/sets?cms_set_ids=&data_types=1&content_count=1&count=18&start=%d&cms_area_id=3b4c609c-6a0d-4cb9-9cce-0605f32b79ec&cms_block_id=115117&orderby=published_desc&content_video_orientation=horizontal,vertical,square&content_type=video&status=enabled&text_search=&data_type_search=%%7B%%227%%22:%%22436%%22%%7D`, baseURL, size*index)
 	client := resty.New()
 	res, err := client.R().SetHeaders(header).Get(uri)

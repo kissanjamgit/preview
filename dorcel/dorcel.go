@@ -13,8 +13,16 @@ type dorcel struct {
 	source string
 }
 
-func New(source string) preview.Preview {
-	return &dorcel{source}
+func (d *dorcel) SetSource(source string) {
+	d.source = source
+}
+
+func (d dorcel) Name() string {
+	return "dorcel"
+}
+
+func New() *dorcel {
+	return &dorcel{}
 }
 
 var (
@@ -25,7 +33,7 @@ var (
 	}
 )
 
-func (d *dorcel) Get(index int) (list []preview.ContentResource, err error) {
+func (d dorcel) Get(index int) (list []preview.ContentResource, err error) {
 	index += 1
 	uri := fmt.Sprintf(`%s/scene/list/more/?lang=en&page=%d&sorting=new`, baseURL, index) // 0 isn't allowed; 0 == 1
 	client := resty.New()

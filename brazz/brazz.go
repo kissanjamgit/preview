@@ -5,22 +5,43 @@ import (
 	"encoding/json"
 	"fmt"
 	"maps"
+	"os"
 	"regexp"
 	"strings"
 	"time"
 
 	"github.com/kissanjamgit/preview"
-
 	"resty.dev/v3"
 )
-
-var Domain = []string{`brazzers`, `milfed`, `bangbros`, `realitykings`, `twistys`, `digitalplayground`, `mofos`, `letsdoeit`, `mypervyfamily`, `deviante`}
 
 type Brazz struct {
 	Source string
 }
 
-func (b *Brazz) Get(index int) (list []preview.ContentResource, err error) {
+func New() *Brazz {
+	return &Brazz{}
+}
+
+func (b Brazz) SearchIdentity()       {}
+func (b Brazz) SearchDomainIdentity() {}
+
+var domain = []string{`brazzers`, `milfed`, `bangbros`, `realitykings`, `twistys`, `digitalplayground`, `mofos`, `letsdoeit`, `mypervyfamily`, `deviante`}
+
+func (b Brazz) Domain() []string { return domain }
+
+func (b Brazz) Name() string {
+	return domain[0]
+}
+
+func (b *Brazz) SetSource(source string) {
+	b.Source = source
+}
+
+func (b Brazz) Get(index int) ([]preview.ContentResource, error) {
+	return b.get(nil, index)
+}
+
+func (b Brazz) get(query *string, index int) (list []preview.ContentResource, err error) {
 	client := resty.New()
 	defer client.Close()
 	var jwt string
@@ -34,13 +55,31 @@ func (b *Brazz) Get(index int) (list []preview.ContentResource, err error) {
 	data := regexp.MustCompile(`"jwt":"(\S*?)"`).FindStringSubmatch(req.String())
 	jwt = data[len(data)-1]
 
-	url := fmt.Sprintf("https://site-api.project1service.com/v2/releases?adaptiveStreamingOnly=false&dateReleased=%%3C%s&orderBy=-dateReleased&type=scene&limit=40&offset=%d", time.Now().Format("2006-01-02"), 40*index)
-	res, err := client.R().SetHeaders(header(&jwt, domain)).Get(url)
-	if err != nil {
-		fmt.Println(err)
-		return
+	var url string
+	Req := client.R().SetHeaders(header(&jwt, domain))
+	if query != nil {
+		url = fmt.Sprintf("https://site-api.project1service.com/v1/dd/videos?pageType=SEARCH_VIDEOS&limit=24&offset=%d&orderBy=newest&query=%s&sexualOrientation=straight&source=p1", 24*index, *query)
+		res, e := Req.Get(url)
+		if err != nil {
+			return nil, e
+		}
+		os.WriteFile(`content.json`, res.Bytes(), 0o644)
+		var ja JSONAdapteQuery
+		err = json.Unmarshal(res.Bytes(), &ja)
+		if err != nil {
+			return nil, e
+		}
+		for _, item := range ja.Results {
+			list = append(list, preview.ContentResource{Source: cleanBrazz(b.Source, item.Title, item.ID), View: item.Videos.Mediabook.Files.Res720p.URL.View})
+		}
+		return list, nil
 	}
+	url = fmt.Sprintf("https://site-api.project1service.com/v2/releases?adaptiveStreamingOnly=false&dateReleased=%%3C%s&orderBy=-dateReleased&type=scene&limit=40&offset=%d", time.Now().Format("2006-01-02"), 40*index)
 
+	res, e := Req.Get(url)
+	if err != nil {
+		return nil, e
+	}
 	var adapt AdaptarJSONParse
 	err = json.Unmarshal(res.Bytes(), &adapt)
 	if err != nil {
@@ -48,13 +87,13 @@ func (b *Brazz) Get(index int) (list []preview.ContentResource, err error) {
 	}
 
 	for _, item := range adapt.Result {
-		list = append(list, preview.ContentResource{Source: cleanBrazz(b.Source, item), View: item.Video.Mediabook.Files.Res720p.Urls.View})
+		list = append(list, preview.ContentResource{Source: cleanBrazz(b.Source, item.Title, item.ID), View: item.Video.Mediabook.Files.Res720p.Urls.View})
 	}
 	return
 }
 
-func New(source string) preview.Preview {
-	return &Brazz{source}
+func (b Brazz) Search(query string, index int) ([]preview.ContentResource, error) {
+	return b.get(&query, index)
 }
 
 var sceneOrVideo = map[string]bool{
@@ -95,8 +134,8 @@ func header(jwt *string, domain string) map[string]string {
 	return h
 }
 
-func cleanBrazz(domain string, j AdapatJSONResult) string {
-	s := j.Title
+func cleanBrazz(domain string, title string, id int) string {
+	s := title
 	s = strings.ToLower(s)
 	s = invalidChars.ReplaceAllString(s, "")
 	s = strings.ReplaceAll(s, " ", "-")
@@ -105,7 +144,25 @@ func cleanBrazz(domain string, j AdapatJSONResult) string {
 	if b := sceneOrVideo[domain]; !b {
 		S = "video"
 	}
-	return fmt.Sprintf("https://%s.com/%s/%v/%s", domain, S, j.ID, s)
+	return fmt.Sprintf("https://%s.com/%s/%v/%s", domain, S, id, s)
+}
+
+type JSONAdapteQuery struct {
+	Results []struct {
+		ID     int    `json:"id"`
+		Title  string `json:"title"`
+		Videos struct {
+			Mediabook struct {
+				Files struct {
+					Res720p struct {
+						URL struct {
+							View string `json:"view"`
+						} `json:"urls"`
+					} `json:"720p"`
+				} `json:"files"`
+			} `json:"mediabook"`
+		} `json:"videos"`
+	} `json:"result"`
 }
 
 type AdapatJSONVideo struct {

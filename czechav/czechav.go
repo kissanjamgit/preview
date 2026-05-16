@@ -13,15 +13,23 @@ type czechav struct {
 	source string
 }
 
-func New(source string) preview.Preview {
-	return &czechav{source}
+func (c czechav) Name() string {
+	return "czechav"
+}
+
+func (c *czechav) SetSource(source string) {
+	c.source = source
+}
+
+func New() *czechav {
+	return &czechav{}
 }
 
 var Domain = []string{
 	`czechstreets`, `czechfantasy`, `czechgangbang`, `czechmassage`, `perversefamily`,
 }
 
-func (c *czechav) Get(index int) (list []preview.ContentResource, err error) {
+func (c czechav) Get(index int) (list []preview.ContentResource, err error) {
 	baseURL := `https://` + c.source + `.com`
 	index += 1
 	uri := fmt.Sprintf(`%s/pages/page-%d/?render=1`, baseURL, index)

@@ -15,7 +15,11 @@ type Vip struct {
 	source string
 }
 
-func (v *Vip) Get(index int) (pr []preview.ContentResource, err error) {
+func (v *Vip) SetSource(source string) {
+	v.source = source
+}
+
+func (v Vip) Get(index int) (pr []preview.ContentResource, err error) {
 	if index < 1 {
 		index = 1
 	}
@@ -46,6 +50,10 @@ func (v *Vip) Get(index int) (pr []preview.ContentResource, err error) {
 	return
 }
 
-func New(source string) preview.Preview {
-	return &Vip{source}
+func (v Vip) Name() string {
+	return "vip4k"
+}
+
+func New() *Vip {
+	return &Vip{}
 }

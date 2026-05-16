@@ -16,6 +16,10 @@ type teamskt struct {
 	Source string
 }
 
+func (t *teamskt) SetSource(source string) {
+	t.Source = source
+}
+
 type adaptJSONHits struct {
 	Hits struct {
 		Hits []struct {
@@ -40,7 +44,7 @@ var tree = []StudioPath{
 	{`teamskeet`, `ts_network`}, {`swappz`, `swap_bundle`}, {`freeuse`, `freeusebundle`}, {`dadcrush`, `ts_dc`}, {`pervmom`, `ts_pvm`}, {`sislovesme`, `ts_slm`}, {`mylf`, `mylf_bundle`}, {`familystrokes`, `familybundle`}, {`shoplyfter`, `ts_shl`}, {`pervz`, `pervbundle`},
 }
 
-func (t *teamskt) Get(index int) (list []preview.ContentResource, err error) {
+func (t teamskt) Get(index int) (list []preview.ContentResource, err error) {
 	if index < 0 {
 		err = fmt.Errorf("index must be greater than 0")
 		return
@@ -77,6 +81,14 @@ var Domain = func() (s []string) {
 	return
 }()
 
-func New(source string) preview.Preview {
-	return &teamskt{source}
+func (t teamskt) Domain() []string {
+	return Domain
+}
+
+func (t teamskt) Name() string {
+	return "teamskeet"
+}
+
+func New() *teamskt {
+	return &teamskt{}
 }

@@ -2,171 +2,45 @@ package main
 
 import (
 	"fmt"
-	"net/url"
 	"os"
 	"os/exec"
 	"strconv"
 	"strings"
 
-	"github.com/kissanjamgit/preview/advd"
-	"github.com/kissanjamgit/preview/allanal"
-	"github.com/kissanjamgit/preview/aziani"
-	"github.com/kissanjamgit/preview/blacked"
-	"github.com/kissanjamgit/preview/brazz"
+	"github.com/kissanjamgit/preview/barrel"
 	"github.com/kissanjamgit/preview/config"
-	"github.com/kissanjamgit/preview/czechav"
-	"github.com/kissanjamgit/preview/dorcel"
-	"github.com/kissanjamgit/preview/enjoyx"
-	"github.com/kissanjamgit/preview/evil"
-	"github.com/kissanjamgit/preview/ftherapy"
-	"github.com/kissanjamgit/preview/hd8k"
-	"github.com/kissanjamgit/preview/hhshot"
-	"github.com/kissanjamgit/preview/lifese"
-	"github.com/kissanjamgit/preview/littlecaprice"
-	"github.com/kissanjamgit/preview/manyv"
-	"github.com/kissanjamgit/preview/newsens"
-	"github.com/kissanjamgit/preview/nporn"
-	"github.com/kissanjamgit/preview/pbox"
-	"github.com/kissanjamgit/preview/private"
-	"github.com/kissanjamgit/preview/pworld"
-	smex "github.com/kissanjamgit/preview/sexmex"
-	"github.com/kissanjamgit/preview/teamskt"
-	"github.com/kissanjamgit/preview/vip"
-	"github.com/kissanjamgit/preview/xp"
 
 	"github.com/kissanjamgit/preview"
 
 	"github.com/spf13/cobra"
 )
 
-///todo
-//https://en.inkasex.com/videos/latest
-//https://aziani.com/
-//https://bukkake.to/
-//https://pornbox.com/application/studio/328
-//https://pornbox.com/application/model/188419
-///
-
-type Host interface {
-	Name() string
-}
-
-type Site struct {
-	name string
-	View func(string) preview.Preview
-}
-
-func (s *Site) Name() string { return s.name }
-
-type Family struct {
-	name string
-	List []Site
-}
-
-func (f *Family) Name() string { return f.name }
-
-// type Domain struct {
-// 	domain string
-// 	view   func(string) preview.Preview
-// }
-
-func toDomainList(name string, list []string, f func(string) preview.Preview) (d Host) {
-	l := []Site{}
-	for _, s := range list {
-		l = append(l, Site{s, f})
+func PR2String(pr []preview.ContentResource) string {
+	var buffer strings.Builder
+	buffer.WriteString("#EXTM3U\n")
+	for _, cr := range pr {
+		buffer.WriteString("#EXTINF:-1," + cr.Source + "\n" + cr.View + "\n")
 	}
-	d = &Family{name, l}
-	return
+	return buffer.String()
 }
 
-// func run() (pr []preview.ContentResource, err error) {
-// input := flag.Int("i", 0, "select the provider")
-// search := flag.String("search", "", "search for preview")
-// index := flag.Int("index", 0, "index")
-// help := flag.Bool("h", false, "print help text")
-// flag.Parse()
+var exampleSearch = func() string {
+	var buff strings.Builder
+	for i, p := range barrel.Domain {
+		p, ok := p.(preview.Search)
+		if !ok {
+			continue
+		}
 
-// var domain []Domain
-// domain = append(domain, toDomainList(brazz.Domain, brazz.New)...)
-// domain = append(domain, toDomainList(pbox.Domain, pbox.New)...)
-// domain = append(domain, Domain{`teamskeet`, teamskt.New})
-// domain = append(domain, Domain{`pornworld`, pworld.New})
-// domain = append(domain, Domain{`sexmex`, smex.New})
-// domain = append(domain, Domain{`vip4k`, vip.New})
-// domain = append(domain, Domain{`pornhd8k`, hd8k.New})
-
-// if *search != "" {
-// 	var hostname string
-// 	if uri, err := url.Parse(*search); err != nil && uri.Hostname() != `` {
-// 		return nil, err
-// 	} else {
-// 		hostname = uri.Hostname()
-// 	}
-//
-// 	switch {
-// 	case strings.Contains(hostname, `manyvids`):
-// 		m := manyv.New(*search)
-// 		return m.Search(*index)
-// 	default:
-// 		return nil, fmt.Errorf("switch case exhausted")
-//
-// 	}
-// }
-
-// if *help || *input == -1 {
-// 	var buff strings.Builder
-// 	for i, d := range domain {
-// 		fmt.Fprintf(&buff, "%2d: %s\n", i, d.domain)
-// 	}
-// 	fmt.Println(buff.String())
-// 	return nil, nil
-// }
-
-// str := domain[*input].domain
-// pr, err = domainMap()[str](str).Get(*index)
-// if err != nil {
-// 	fmt.Println(err)
-// 	os.Exit(1)
-// }
-// 	return
-// }
-
-var hostList = buildDomains()
-
-func buildDomains() (d []Host) {
-	d = append(d, toDomainList(`brazzer`, brazz.Domain, brazz.New))
-	d = append(d, toDomainList(`pornbox`, pbox.Domain, pbox.New))
-	d = append(d, toDomainList(`teamskeet`, teamskt.Domain, teamskt.New))
-
-	d = append(d, &Site{`pornworld`, pworld.New},
-		&Site{`sexmex`, smex.New},
-		&Site{`vip4k`, vip.New},
-		&Site{`pornhd8k`, hd8k.New},
-		&Site{`private`, private.New},
-		&Site{`dorcel`, dorcel.New},
-		&Site{`littlecaprice`, littlecaprice.New},
-		&Site{`enjoyx`, enjoyx.New},
-		&Site{`lifese`, lifese.New},
-	)
-	d = append(d, toDomainList(`nubiles`, nporn.Domain, nporn.New))
-	d = append(d, toDomainList(`familytherapyxxx`, ftherapy.Domain, ftherapy.New))
-	d = append(d, toDomainList(`czechav`, czechav.Domain, czechav.New))
-	d = append(d, toDomainList(`newsensations`, newsens.Domain, newsens.New))
-	d = append(d, toDomainList(`allanal`, allanal.Domain, allanal.New))
-	d = append(d, toDomainList(`evilangel`, evil.Domain, evil.New))
-
-	d = append(d, toDomainList(`hhshot`, hhshot.Domain, hhshot.New))
-	d = append(d, &Site{`xp`, xp.New})
-	d = append(d, toDomainList(`blacked`, blacked.Domain, blacked.New))
-	d = append(d, toDomainList(`advd`, advd.Domain, advd.New))
-	d = append(d, &Site{`aziani`, aziani.New})
-	return
-}
+		fmt.Fprintf(&buff, "%2d: %s\n", i, p.Name())
+	}
+	return buff.String()
+}()
 
 var example = func() string {
 	var buff strings.Builder
-	for i, d := range hostList {
-		fmt.Fprintf(&buff, "%2d: %s\n", i, d.Name())
+	for i, p := range barrel.Domain {
+		fmt.Fprintf(&buff, "%2d: %s\n", i, p.Name())
 	}
 	return buff.String()
 }()
@@ -182,52 +56,112 @@ func getM3U(cmd *cobra.Command, args []string, index int) (m3u string, err error
 		return
 	}
 
-	host := hostList[input]
-	var site Site
-
-	switch h := host.(type) {
-	case *Family:
-		{
-			var buff strings.Builder
-			for i, d := range h.List {
-				fmt.Fprintf(&buff, "%2d: %s\n", i, d.Name())
-			}
-			cmd.Example = buff.String()
-
-			if len(args) < 2 {
-				err = fmt.Errorf("need one more argument")
-				return
-			}
-			subIndex, err := strconv.Atoi(args[1])
-			if err != nil {
-				return ``, err
-			}
-			if subIndex < 0 || subIndex >= len(h.List) {
-				err = fmt.Errorf("subIndex >= 0 && subIndex < len(f.List); subindex: %d", subIndex)
-				return ``, err
-			}
-			site = h.List[subIndex]
+	view := barrel.Domain[input]
+	if view, ok := view.(preview.Domain); ok {
+		var buff strings.Builder
+		for i, d := range view.Domain() {
+			fmt.Fprintf(&buff, "%2d: %s\n", i, d)
 		}
-	case *Site:
-		site = *h
+		cmd.Example = buff.String()
 
-	default:
-		err = fmt.Errorf("switch case exhausted")
-		return
-
+		if len(args) < 2 {
+			err = fmt.Errorf("need one more argument")
+			return
+		}
+		subIndex, err := strconv.Atoi(args[1])
+		if err != nil {
+			return ``, err
+		}
+		if subIndex < 0 || subIndex >= len(view.Domain()) {
+			err = fmt.Errorf("subIndex >= 0 && subIndex < len(f.List); subindex: %d", subIndex)
+			return ``, err
+		}
+		view.SetSource(view.Domain()[subIndex])
 	}
 
-	pr, err := site.View(site.name).Get(index)
+	pr, err := view.Get(index)
 	if err != nil {
 		return ``, err
 	}
-	var buffer strings.Builder
-	buffer.WriteString("#EXTM3U\n")
-	for _, cr := range pr {
-		buffer.WriteString("#EXTINF:-1," + cr.Source + "\n" + cr.View + "\n")
-	}
-	m3u = buffer.String()
+	m3u = PR2String(pr)
+
 	return
+}
+
+func search(cfg config.Config, index *int) *cobra.Command {
+	return &cobra.Command{
+		Use:     "search",
+		Example: exampleSearch,
+		RunE: func(cmd *cobra.Command, args []string) (err error) {
+			if len(args) == 0 {
+				err = fmt.Errorf("need at least one argument")
+				return
+			}
+			searchList := []preview.Search{}
+			for _, item := range barrel.Domain {
+				p, ok := item.(preview.SearchDomain)
+				if !ok {
+					continue
+				}
+				searchList = append(searchList, p)
+			}
+			listIndex, err := strconv.Atoi(args[0])
+			if err != nil {
+				return
+			}
+			if len(searchList) < listIndex {
+				return fmt.Errorf(`len(searchList) < listIndex `)
+			}
+
+			var pr []preview.ContentResource
+			searchBase := searchList[listIndex]
+			if searchDomain, ok := searchBase.(preview.SearchDomain); ok {
+				if len(args) < 3 {
+					err = fmt.Errorf("len(args) < 3")
+					return
+				}
+				sublistIndex, err := strconv.Atoi(args[1])
+				if err != nil {
+					return err
+				}
+				searchDomain.SetSource(searchDomain.Domain()[sublistIndex])
+				pr, err = searchDomain.Search(args[2], *index)
+				if err != nil {
+					return err
+				}
+			}
+			// var hostname string
+			// if uri, err := url.Parse(args[0]); err != nil && uri.Hostname() != `` {
+			// 	return err
+			// } else {
+			// 	hostname = uri.Hostname()
+			// }
+			//
+			// switch {
+			// case strings.Contains(hostname, `manyvids`):
+			// 	m := manyv.New(args[0])
+			// 	m.Search(index)
+			// default:
+			// 	err = fmt.Errorf("switch case exhausted")
+			// 	return
+			//
+			// }
+
+			m3u := PR2String(pr)
+			switch cmd.Parent().Name() {
+			case `show`:
+				fmt.Println(m3u)
+			case `play`:
+				err = cobraPlay(cfg, m3u)
+				if err != nil {
+					return err
+				}
+			default:
+				return fmt.Errorf("switch case exhausted")
+			}
+			return
+		},
+	}
 }
 
 func cobraPlay(cfg config.Config, str string) (err error) {
@@ -291,35 +225,17 @@ func cli() (err error) {
 			return cobraPlay(cfg, m3u)
 		},
 	}
-	search := cobra.Command{
-		Use:     "search",
-		Example: example,
-		RunE: func(cmd *cobra.Command, args []string) (err error) {
-			var hostname string
-			if uri, err := url.Parse(args[0]); err != nil && uri.Hostname() != `` {
-				return err
-			} else {
-				hostname = uri.Hostname()
-			}
-
-			switch {
-			case strings.Contains(hostname, `manyvids`):
-				m := manyv.New(args[0])
-				m.Search(index)
-			default:
-				err = fmt.Errorf("switch case exhausted")
-				return
-
-			}
-			return
-		},
-	}
 
 	show.Flags().IntVar(&index, "index", 0, "index value")
 	play.Flags().IntVar(&index, "index", 0, "index value")
 	cbr.AddCommand(&show)
 	cbr.AddCommand(&play)
-	cbr.AddCommand(&search)
+	searchPlay := search(cfg, &index)
+	searchPlay.Flags().IntVar(&index, "index", 0, "index value")
+	searchShow := search(cfg, &index)
+	searchShow.Flags().IntVar(&index, "index", 0, "index value")
+	play.AddCommand(searchPlay)
+	show.AddCommand(searchShow)
 	err = cbr.Execute()
 	if err != nil {
 		os.Exit(1)

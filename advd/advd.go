@@ -13,18 +13,31 @@ type advd struct {
 	source string
 }
 
-func New(source string) preview.Preview {
-	return &advd{source: source}
+func (a *advd) Name() string {
+	return "advd"
 }
 
-var Domain = []string{`movie`, `clip`}
+func (a *advd) SetSource(source string) {
+	a.source = source
+}
+
+func New() *advd {
+	return &advd{}
+}
+
+var domain = []string{`movie`, `clip`}
+
+func (a advd) Domain() []string {
+	return domain
+}
+
 var (
 	baseURL  = `https://www.adultdvdempire.com`
 	movieFmt = `https://video.adultempire.com/hls/trailer/%s/index-f2-v1-a1.m3u8`
 	clipFmt  = `https://video.adultempire.com/hls/previewscene/%s/%s/index-f2-v1-a1.m3u8`
 )
 
-func (a *advd) Get(index int) (list []preview.ContentResource, err error) {
+func (a advd) Get(index int) (list []preview.ContentResource, err error) {
 	index += 1
 	client := resty.New()
 	var extact func(string) ([]preview.ContentResource, error)

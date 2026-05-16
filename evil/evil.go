@@ -17,8 +17,16 @@ type evil struct {
 	Source string
 }
 
-func New(source string) preview.Preview {
-	return &evil{source}
+func (e *evil) SetSource(source string) {
+	e.Source = source
+}
+
+func (*evil) Name() string {
+	return Domain[0]
+}
+
+func New() *evil {
+	return &evil{}
 }
 
 var Domain = []string{`evilangel`, `moderndaysins`, `devilsfilm`, `puretaboo`, `mommysboy`, `mommysgirl`, `girlsway`, `21sextury`, `outofthefamily`, `tabooheat`, `accidentalgangbang`, `mommyblowsbest`, `nurumassage`, `filthykings`, `dogfartnetwork`, `gangbangcreampie`, `filthykings`}
@@ -69,7 +77,7 @@ func body(host string, index int) string {
 	return fmt.Sprintf(`{"requests":[{"indexName":"all_scenes_latest_desc","analytics":true,"analyticsTags":["component:searchlisting","section:freetour","site:%s","context:videos","device:desktop"],"clickAnalytics":true,"facetingAfterDistinct":true,"facets":["categories.url_name"],"filters":"(upcoming:'0') AND availableOnSite:%s","highlightPostTag":"__/ais-highlight__","highlightPreTag":"__ais-highlight__","hitsPerPage":60,"maxValuesPerFacet":1000,"page":%d,"query":""}]}`, host, host, index)
 }
 
-func (e *evil) Get(index int) (list []preview.ContentResource, err error) {
+func (e evil) Get(index int) (list []preview.ContentResource, err error) {
 	origin := fmt.Sprintf("https://www.%s.com", e.Source)
 	client := resty.New()
 

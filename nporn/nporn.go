@@ -15,15 +15,23 @@ type nporn struct {
 	Source string
 }
 
-func New(source string) preview.Preview {
-	return &nporn{source}
+func (n *nporn) SetSource(source string) {
+	n.Source = source
+}
+
+func (n nporn) Name() string {
+	return "nporn"
+}
+
+func New() *nporn {
+	return &nporn{}
 }
 
 var size = 12
 
-var Domain = []string{`nubiles-porn`, `momlover`, `shesbreedingmaterial`, `realitysis`, `caughtmycoach`, `cheatingsis`, `cumswappingsis`, `cumswappingsis`, `myfamilypies`, `stepsiblingscaught`, `familyswap`, `momsteachsex`}
+var Domain = []string{`nubiles-porn`, `brattysis`, `momlover`, `shesbreedingmaterial`, `realitysis`, `caughtmycoach`, `cheatingsis`, `cumswappingsis`, `cumswappingsis`, `myfamilypies`, `stepsiblingscaught`, `familyswap`, `momsteachsex`}
 
-func (n *nporn) Get(index int) (list []preview.ContentResource, err error) {
+func (n nporn) Get(index int) (list []preview.ContentResource, err error) {
 	client := resty.New()
 	baseURL := `https://` + n.Source + `.com`
 	uri := fmt.Sprintf("%s/video/gallery/%d", baseURL, size*index)

@@ -18,6 +18,14 @@ type PBox struct {
 	source string
 }
 
+func (p *PBox) SetSource(source string) {
+	p.source = source
+}
+
+func (p PBox) Domain() []string {
+	return Domain
+}
+
 type contentResult struct {
 	contentID      string
 	runtime        time.Duration
@@ -124,11 +132,15 @@ var domain = map[string]int{
 	"Mambo Perv":          197,
 }
 
-func New(source string) preview.Preview {
-	return &PBox{source: source}
+func New() *PBox {
+	return &PBox{}
 }
 
-func (p *PBox) Get(index int) (list []preview.ContentResource, err error) {
+func (p PBox) Name() string {
+	return "pornbox"
+}
+
+func (p PBox) Get(index int) (list []preview.ContentResource, err error) {
 	client := resty.New()
 	value, ok := domain[p.source]
 	if !ok {

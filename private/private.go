@@ -13,11 +13,19 @@ type private struct {
 	source string
 }
 
-func New(source string) preview.Preview {
-	return &private{source}
+func (p *private) Name() string {
+	return "private"
 }
 
-func (p *private) Get(index int) (list []preview.ContentResource, err error) {
+func (p *private) SetSource(source string) {
+	p.source = source
+}
+
+func New() *private {
+	return &private{}
+}
+
+func (p private) Get(index int) (list []preview.ContentResource, err error) {
 	index += 1
 
 	uri := fmt.Sprintf(`https://www.private.com/scenes/%d/`, index) // 0 isn't allowed;

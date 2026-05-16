@@ -14,8 +14,16 @@ type allanal struct {
 	Source string
 }
 
-func New(source string) preview.Preview {
-	return &allanal{source}
+func (a allanal) Name() string {
+	return "allanal"
+}
+
+func (a *allanal) SetSource(source string) {
+	a.Source = source
+}
+
+func New() *allanal {
+	return &allanal{}
 }
 
 type JSONAdapter struct {
@@ -34,7 +42,7 @@ type JSONAdapter struct {
 
 var Domain = []string{`allanal`, `trueanal`, `analonly`, `swallowed`, `nympho`, `dirtyauditions`}
 
-func (a *allanal) Get(index int) (list []preview.ContentResource, err error) {
+func (a allanal) Get(index int) (list []preview.ContentResource, err error) {
 	uri := fmt.Sprintf(`https://tour.%s.com/scenes`, a.Source)
 	if a.Source == `dirtyauditions` {
 		uri = "https://dirtyauditions.com/scenes"

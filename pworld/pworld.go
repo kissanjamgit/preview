@@ -14,7 +14,11 @@ type PWorld struct {
 	source string
 }
 
-func (p *PWorld) Get(index int) (pr []preview.ContentResource, err error) {
+func (p *PWorld) SetSource(source string) {
+	p.source = source
+}
+
+func (p PWorld) Get(index int) (pr []preview.ContentResource, err error) {
 	client := resty.New().R()
 	url := fmt.Sprintf("https://pornworld.com/videos?page=%d", index)
 	res, err := client.Execute(resty.MethodGet, url)
@@ -47,6 +51,10 @@ func (p *PWorld) Get(index int) (pr []preview.ContentResource, err error) {
 	return
 }
 
-func New(Source string) preview.Preview {
-	return &PWorld{Source}
+func (p PWorld) Name() string {
+	return "pornworld"
+}
+
+func New() *PWorld {
+	return &PWorld{}
 }

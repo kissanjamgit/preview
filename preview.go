@@ -20,7 +20,7 @@ type Domain interface {
 type Search interface {
 	Preview
 	SearchIdentity()
-	Search(query string, index int) ([]ContentResource, error)
+	Search(query []string, index int) ([]ContentResource, error)
 }
 
 type SearchDomain interface {
@@ -28,5 +28,5 @@ type SearchDomain interface {
 	SearchIdentity()
 	SearchDomainIdentity()
 	Domain() []string
-	Search(query string, index int) ([]ContentResource, error)
+	Search(query []string, index int) ([]ContentResource, error)
 }

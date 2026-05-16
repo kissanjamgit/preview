@@ -41,7 +41,7 @@ func (b Brazz) Get(index int) ([]preview.ContentResource, error) {
 	return b.get(nil, index)
 }
 
-func (b Brazz) get(query *string, index int) (list []preview.ContentResource, err error) {
+func (b Brazz) get(query []string, index int) (list []preview.ContentResource, err error) {
 	client := resty.New()
 	defer client.Close()
 	var jwt string
@@ -57,8 +57,9 @@ func (b Brazz) get(query *string, index int) (list []preview.ContentResource, er
 
 	var url string
 	Req := client.R().SetHeaders(header(&jwt, domain))
-	if query != nil {
-		url = fmt.Sprintf("https://site-api.project1service.com/v1/dd/videos?pageType=SEARCH_VIDEOS&limit=24&offset=%d&orderBy=newest&query=%s&sexualOrientation=straight&source=p1", 24*index, *query)
+	if len(query) > 0 {
+		url = fmt.Sprintf("https://site-api.project1service.com/v1/dd/videos?pageType=SEARCH_VIDEOS&limit=24&offset=%d&orderBy=newest&query=%s&sexualOrientation=straight&source=p1", 24*index, strings.Join(query, `%20`))
+		fmt.Println(url)
 		res, e := Req.Get(url)
 		if err != nil {
 			return nil, e
@@ -92,8 +93,8 @@ func (b Brazz) get(query *string, index int) (list []preview.ContentResource, er
 	return
 }
 
-func (b Brazz) Search(query string, index int) ([]preview.ContentResource, error) {
-	return b.get(&query, index)
+func (b Brazz) Search(query []string, index int) ([]preview.ContentResource, error) {
+	return b.get(query, index)
 }
 
 var sceneOrVideo = map[string]bool{

@@ -116,7 +116,15 @@ func search(cfg config.Config, index *int) *cobra.Command {
 			var pr []preview.ContentResource
 			searchBase := searchList[listIndex]
 			if searchDomain, ok := searchBase.(preview.SearchDomain); ok {
+				var buff strings.Builder
+				for i, d := range searchDomain.Domain() {
+					fmt.Fprintf(&buff, "%2d: %s\n", i, d)
+				}
+
+				cmd.Example = buff.String()
+
 				if len(args) < 3 {
+
 					err = fmt.Errorf("len(args) < 3")
 					return
 				}
@@ -125,10 +133,11 @@ func search(cfg config.Config, index *int) *cobra.Command {
 					return err
 				}
 				searchDomain.SetSource(searchDomain.Domain()[sublistIndex])
-				pr, err = searchDomain.Search(args[2], *index)
+				pr, err = searchDomain.Search(args[2:], *index)
 				if err != nil {
 					return err
 				}
+
 			}
 			// var hostname string
 			// if uri, err := url.Parse(args[0]); err != nil && uri.Hostname() != `` {

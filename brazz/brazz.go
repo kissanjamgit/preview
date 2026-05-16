@@ -2,10 +2,10 @@
 package brazz
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"maps"
-	"os"
 	"regexp"
 	"strings"
 	"time"
@@ -57,34 +57,34 @@ func (b Brazz) get(query []string, index int) (list []preview.ContentResource, e
 
 	var url string
 	Req := client.R().SetHeaders(header(&jwt, domain))
-	if len(query) > 0 {
-		url = fmt.Sprintf("https://site-api.project1service.com/v1/dd/videos?pageType=SEARCH_VIDEOS&limit=24&offset=%d&orderBy=newest&query=%s&sexualOrientation=straight&source=p1", 24*index, strings.Join(query, `%20`))
+	if len(query) != 0 {
+		url = fmt.Sprintf("https://site-api.project1service.com/v1/dd/videos?pageType=SEARCH_VIDEOS&limit=24&offset=%d&orderBy=newest&query=%s&sexualOrientation=straight&source=p1", 24*index, strings.Join(query, `+`))
 		fmt.Println(url)
 		res, e := Req.Get(url)
 		if err != nil {
 			return nil, e
 		}
-		os.WriteFile(`content.json`, res.Bytes(), 0o644)
 		var ja JSONAdapteQuery
-		err = json.Unmarshal(res.Bytes(), &ja)
-		if err != nil {
+		e = json.Unmarshal(res.Bytes(), &ja)
+		if e != nil {
 			return nil, e
 		}
+		fmt.Println(ja)
 		for _, item := range ja.Results {
 			list = append(list, preview.ContentResource{Source: cleanBrazz(b.Source, item.Title, item.ID), View: item.Videos.Mediabook.Files.Res720p.URL.View})
 		}
 		return list, nil
 	}
-	url = fmt.Sprintf("https://site-api.project1service.com/v2/releases?adaptiveStreamingOnly=false&dateReleased=%%3C%s&orderBy=-dateReleased&type=scene&limit=40&offset=%d", time.Now().Format("2006-01-02"), 40*index)
 
+	url = fmt.Sprintf("https://site-api.project1service.com/v2/releases?adaptiveStreamingOnly=false&dateReleased=%%3C%s&orderBy=-dateReleased&type=scene&limit=40&offset=%d", time.Now().Format("2006-01-02"), 40*index)
 	res, e := Req.Get(url)
 	if err != nil {
 		return nil, e
 	}
 	var adapt AdaptarJSONParse
-	err = json.Unmarshal(res.Bytes(), &adapt)
-	if err != nil {
-		return
+	e = json.Unmarshal(res.Bytes(), &adapt)
+	if e != nil {
+		return nil, e
 	}
 
 	for _, item := range adapt.Result {
@@ -150,20 +150,48 @@ func cleanBrazz(domain string, title string, id int) string {
 
 type JSONAdapteQuery struct {
 	Results []struct {
-		ID     int    `json:"id"`
-		Title  string `json:"title"`
-		Videos struct {
-			Mediabook struct {
-				Files struct {
-					Res720p struct {
-						URL struct {
-							View string `json:"view"`
-						} `json:"urls"`
-					} `json:"720p"`
-				} `json:"files"`
-			} `json:"mediabook"`
-		} `json:"videos"`
+		ID     int         `json:"id"`
+		Title  string      `json:"title"`
+		Videos VideosField `json:"videos"` // Uses the custom type
 	} `json:"result"`
+}
+
+// VideosField represents the structure when videos are present
+type VideosField struct {
+	Mediabook struct {
+		Files struct {
+			Res720p struct {
+				URL struct {
+					View string `json:"view"`
+				} `json:"urls"`
+			} `json:"720p"`
+		} `json:"files"`
+	} `json:"mediabook"`
+}
+
+// UnmarshalJSON handles both {} (object) and [] (empty array) variants gracefully
+func (v *VideosField) UnmarshalJSON(b []byte) error {
+	trimmed := bytes.TrimSpace(b)
+	if len(trimmed) == 0 {
+		return nil
+	}
+
+	// If the JSON starts with '[', it's an empty array "[]".
+	// We skip unmarshaling so it retains its default zero values.
+	if trimmed[0] == '[' {
+		return nil
+	}
+
+	// If it's an object '{', unmarshal normally.
+	// We use an Alias type to avoid an infinite recursion loop during unmarshaling.
+	type Alias VideosField
+	var a Alias
+	if err := json.Unmarshal(trimmed, &a); err != nil {
+		return err
+	}
+
+	*v = VideosField(a)
+	return nil
 }
 
 type AdapatJSONVideo struct {

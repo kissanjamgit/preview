@@ -3,7 +3,6 @@ package vip
 
 import (
 	"fmt"
-	"os"
 	"regexp"
 
 	"github.com/kissanjamgit/preview"
@@ -29,7 +28,6 @@ func (v Vip) Get(index int) (pr []preview.ContentResource, err error) {
 	if err != nil {
 		return
 	}
-	os.WriteFile("2.html", res.Bytes(), 0o644)
 	hrefList := regexp.MustCompile(`item__main"\s+href="([^"]+)`).FindAllStringSubmatch(res.String(), -1)
 
 	prList := regexp.MustCompile(`"//([^"]+preview.mp4)"`).FindAllStringSubmatch(res.String(), -1)

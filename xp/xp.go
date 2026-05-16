@@ -4,6 +4,7 @@ package xp
 import (
 	"fmt"
 	"regexp"
+	"strings"
 
 	"github.com/kissanjamgit/preview"
 	"resty.dev/v3"
@@ -21,15 +22,22 @@ func (x *xp) SetSource(source string) {
 	x.source = source
 }
 
+func (x xp) SearchIdentity() {}
+
 func New() *xp {
 	return &xp{}
 }
 
 var baseURL = `https://pornxp.ph`
 
-func (x xp) Get(index int) (list []preview.ContentResource, err error) {
+func (x xp) get(query []string, index int) (list []preview.ContentResource, err error) {
 	index += 1
-	uri := fmt.Sprintf(`%s/?page=%d`, baseURL, index)
+	var uri string
+	if len(query) == 0 {
+		uri = fmt.Sprintf(`%s/?page=%d`, baseURL, index)
+	} else {
+		uri = fmt.Sprintf(`%s/tags/%s?page=%d`, baseURL, strings.Join(query, `%20`), index)
+	}
 	client := resty.New()
 	defer client.Close()
 	res, err := client.R().Get(uri)
@@ -43,6 +51,13 @@ func (x xp) Get(index int) (list []preview.ContentResource, err error) {
 		}
 		list = append(list, preview.ContentResource{Source: fmt.Sprintf(`%s/videos/%s`, baseURL, m[2]), View: fmt.Sprintf(`https://%s`, m[1])})
 	}
-
 	return
+}
+
+func (x xp) Get(index int) (list []preview.ContentResource, err error) {
+	return x.get(nil, index)
+}
+
+func (x xp) Search(query []string, index int) ([]preview.ContentResource, error) {
+	return x.get(query, index)
 }

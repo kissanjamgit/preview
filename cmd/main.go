@@ -15,24 +15,29 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func PR2String(pr []preview.ContentResource) string {
+func PR2String(pr []preview.ContentResource) (string, error) {
+	if len(pr) == 0 {
+		return ``, fmt.Errorf("len(pr) == 0")
+	}
 	var buffer strings.Builder
 	buffer.WriteString("#EXTM3U\n")
 	for _, cr := range pr {
 		buffer.WriteString("#EXTINF:-1," + cr.Source + "\n" + cr.View + "\n")
 	}
-	return buffer.String()
+	return buffer.String(), nil
 }
 
 var exampleSearch = func() string {
 	var buff strings.Builder
-	for i, p := range barrel.Domain {
-		p, ok := p.(preview.Search)
+	listLength := 0
+	for _, p := range barrel.Domain {
+		search, ok := p.(preview.Search)
 		if !ok {
 			continue
 		}
 
-		fmt.Fprintf(&buff, "%2d: %s\n", i, p.Name())
+		fmt.Fprintf(&buff, "%2d: %s\n", listLength, search.Name())
+		listLength += 1
 	}
 	return buff.String()
 }()
@@ -83,8 +88,10 @@ func getM3U(cmd *cobra.Command, args []string, index int) (m3u string, err error
 	if err != nil {
 		return ``, err
 	}
-	m3u = PR2String(pr)
-
+	m3u, err = PR2String(pr)
+	if err != nil {
+		return ``, err
+	}
 	return
 }
 
@@ -99,7 +106,7 @@ func search(cfg config.Config, index *int) *cobra.Command {
 			}
 			searchList := []preview.Search{}
 			for _, item := range barrel.Domain {
-				p, ok := item.(preview.SearchDomain)
+				p, ok := item.(preview.Search)
 				if !ok {
 					continue
 				}
@@ -110,12 +117,12 @@ func search(cfg config.Config, index *int) *cobra.Command {
 				return
 			}
 			if len(searchList) < listIndex {
-				return fmt.Errorf(`len(searchList) < listIndex `)
+				return fmt.Errorf(`len(searchList) < listIndex`)
 			}
 
 			var pr []preview.ContentResource
-			searchBase := searchList[listIndex]
-			if searchDomain, ok := searchBase.(preview.SearchDomain); ok {
+			search := searchList[listIndex]
+			if searchDomain, ok := search.(preview.SearchDomain); ok {
 				var buff strings.Builder
 				for i, d := range searchDomain.Domain() {
 					fmt.Fprintf(&buff, "%2d: %s\n", i, d)
@@ -124,7 +131,6 @@ func search(cfg config.Config, index *int) *cobra.Command {
 				cmd.Example = buff.String()
 
 				if len(args) < 3 {
-
 					err = fmt.Errorf("len(args) < 3")
 					return
 				}
@@ -137,7 +143,11 @@ func search(cfg config.Config, index *int) *cobra.Command {
 				if err != nil {
 					return err
 				}
-
+			} else {
+				pr, err = search.Search(args[1:], *index)
+				if err != nil {
+					return err
+				}
 			}
 			// var hostname string
 			// if uri, err := url.Parse(args[0]); err != nil && uri.Hostname() != `` {
@@ -156,7 +166,10 @@ func search(cfg config.Config, index *int) *cobra.Command {
 			//
 			// }
 
-			m3u := PR2String(pr)
+			m3u, err := PR2String(pr)
+			if err != nil {
+				return err
+			}
 			switch cmd.Parent().Name() {
 			case `show`:
 				fmt.Println(m3u)

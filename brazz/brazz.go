@@ -49,7 +49,6 @@ func (b Brazz) get(query []string, index int) (list []preview.ContentResource, e
 	domain := fmt.Sprintf("https://%s.com/", b.Source)
 	req, err := client.R().SetHeaders(header(nil, domain)).Get(domain)
 	if err != nil {
-		fmt.Println(err)
 		return
 	}
 	data := regexp.MustCompile(`"jwt":"(\S*?)"`).FindStringSubmatch(req.String())
@@ -59,7 +58,6 @@ func (b Brazz) get(query []string, index int) (list []preview.ContentResource, e
 	Req := client.R().SetHeaders(header(&jwt, domain))
 	if len(query) != 0 {
 		url = fmt.Sprintf("https://site-api.project1service.com/v1/dd/videos?pageType=SEARCH_VIDEOS&limit=24&offset=%d&orderBy=newest&query=%s&sexualOrientation=straight&source=p1", 24*index, strings.Join(query, `+`))
-		fmt.Println(url)
 		res, e := Req.Get(url)
 		if err != nil {
 			return nil, e
@@ -69,7 +67,6 @@ func (b Brazz) get(query []string, index int) (list []preview.ContentResource, e
 		if e != nil {
 			return nil, e
 		}
-		fmt.Println(ja)
 		for _, item := range ja.Results {
 			list = append(list, preview.ContentResource{Source: cleanBrazz(b.Source, item.Title, item.ID), View: item.Videos.Mediabook.Files.Res720p.URL.View})
 		}

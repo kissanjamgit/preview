@@ -25,6 +25,10 @@ func New() *czechav {
 	return &czechav{}
 }
 
+func (czechav) Domain() []string {
+	return Domain
+}
+
 var Domain = []string{
 	`czechstreets`, `czechfantasy`, `czechgangbang`, `czechmassage`, `perversefamily`,
 }

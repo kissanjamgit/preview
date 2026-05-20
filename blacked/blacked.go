@@ -44,6 +44,10 @@ type JSONAdapte struct {
 	} `json:"props"`
 }
 
+func (Blacked) Domain() []string {
+	return Domain
+}
+
 var Domain = []string{`blacked`, `tushy`, `vixen`, `slayed`, `milfy`, `wifey`, `blackedraw`, `tushyraw`}
 
 var header = map[string]string{

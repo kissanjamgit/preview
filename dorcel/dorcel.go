@@ -25,15 +25,18 @@ func New() *dorcel {
 	return &dorcel{}
 }
 
-var (
-	baseURL = `https://www.dorcelclub.com`
-	headers = map[string]string{
-		"Origin":           baseURL,
-		`X-Requested-With`: `XMLHttpRequest`,
-	}
-)
+var headers = map[string]string{
+	`X-Requested-With`: `XMLHttpRequest`,
+}
+
+func (dorcel) Domain() []string { return Domain }
+
+var Domain = []string{`dorcel`, `itspov`}
 
 func (d dorcel) Get(index int) (list []preview.ContentResource, err error) {
+	baseURL := fmt.Sprintf(`https://www.%s.com`, d.source)
+	headers[`Origin`] = baseURL
+
 	index += 1
 	uri := fmt.Sprintf(`%s/scene/list/more/?lang=en&page=%d&sorting=new`, baseURL, index) // 0 isn't allowed; 0 == 1
 	client := resty.New()

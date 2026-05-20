@@ -40,6 +40,8 @@ type JSONAdapter struct {
 	} `json:"props"`
 }
 
+func (allanal) Domain() []string { return Domain }
+
 var Domain = []string{`allanal`, `trueanal`, `analonly`, `swallowed`, `nympho`, `dirtyauditions`}
 
 func (a allanal) Get(index int) (list []preview.ContentResource, err error) {

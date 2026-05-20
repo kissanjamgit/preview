@@ -21,6 +21,10 @@ func (e *evil) SetSource(source string) {
 	e.Source = source
 }
 
+func (evil) Domain() []string {
+	return Domain
+}
+
 func (*evil) Name() string {
 	return Domain[0]
 }

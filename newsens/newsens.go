@@ -38,6 +38,8 @@ var tree = []StudioPath{
 	{`shanedieselxxx`, `tour_sdxxx`},
 }
 
+func (newsens) Domain() []string { return Domain }
+
 var Domain = func() (s []string) {
 	for _, i := range tree {
 		s = append(s, i.name)

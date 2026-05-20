@@ -26,6 +26,10 @@ func New() *ftherapy {
 	return &ftherapy{}
 }
 
+func (f ftherapy) Domain() []string {
+	return Domain
+}
+
 var Domain = []string{`familytherapyxxx`, `momcomesfirst`, `cockninjastudios`, `perfectgirlfriend`, `analtherapyxxx`, `wifelovesblack`, `teenlovesblack`}
 
 type pathConv struct {

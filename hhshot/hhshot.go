@@ -33,6 +33,8 @@ type siteConfig struct {
 
 var path = []siteConfig{{`hookuphotshot`, `https://hookuphotshot.com/nn/categories/movies/%d/latest/`, `https://hookuphotshot.com%s`}, {`missax`, `https://missax.com/tour/categories/movies_%d_d.html`, `%s`}}
 
+func (hhshot) Domain() []string { return Domain }
+
 var Domain = func() (list []string) {
 	for _, p := range path {
 		list = append(list, p.host)
@@ -40,10 +42,10 @@ var Domain = func() (list []string) {
 	return
 }()
 
-func (p hhshot) Get(index int) (list []preview.ContentResource, err error) {
+func (h hhshot) Get(index int) (list []preview.ContentResource, err error) {
 	config, err := func() (siteConfig, error) {
 		for _, r := range path {
-			if r.host != p.source {
+			if r.host != h.source {
 				continue
 			}
 			return r, nil

@@ -29,6 +29,10 @@ func New() *nporn {
 
 var size = 12
 
+func (nporn) Domain() []string {
+	return Domain
+}
+
 var Domain = []string{`nubiles-porn`, `brattysis`, `momlover`, `shesbreedingmaterial`, `realitysis`, `caughtmycoach`, `cheatingsis`, `cumswappingsis`, `cumswappingsis`, `myfamilypies`, `stepsiblingscaught`, `familyswap`, `momsteachsex`}
 
 func (n nporn) Get(index int) (list []preview.ContentResource, err error) {

@@ -64,7 +64,7 @@ func (a advd) Get(index int) (list []preview.ContentResource, err error) {
 }
 
 func movie(s string) (list []preview.ContentResource, err error) {
-	submatch := regexp.MustCompile(`href="\s*(/(\d+)[^"]*porn-movies.html)"`).FindAllStringSubmatch(s, -1)
+	submatch := regexp.MustCompile(`href="\s*(/(\d+)[^"]*porn-movies.html)"\s*Category="GridViewDVD"`).FindAllStringSubmatch(s, -1)
 	for _, m := range submatch {
 		if len(m) < 2 {
 			continue

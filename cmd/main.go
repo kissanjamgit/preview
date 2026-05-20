@@ -107,9 +107,10 @@ func cli() (err error) {
 
 	show.Flags().IntVar(&index, "index", 0, "index value")
 	play.Flags().IntVar(&index, "index", 0, "index value")
-	search.Add(&cbr, cfg)
 	cbr.AddCommand(&show)
 	cbr.AddCommand(&play)
+
+	search.Add(&cbr, cfg)
 	err = cbr.Execute()
 	if err != nil {
 		os.Exit(1)

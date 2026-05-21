@@ -25,6 +25,8 @@ github.com/dstockton/go-curl-impersonate-net-http-wrapper v0.0.1 h1:TNbM48gfHyXQ
 github.com/dstockton/go-curl-impersonate-net-http-wrapper v0.0.1/go.mod h1:dqIJ38/pUa68PaqBEL0YOtoHrzvE2pb3fhyQi9kzzfY=
 github.com/inconshreveable/mousetrap v1.1.0 h1:wN+x4NVGpMsO7ErUn/mUI3vEoE6Jt13X2s0bqwp9tc8=
 github.com/inconshreveable/mousetrap v1.1.0/go.mod h1:vpF70FUmC8bwa3OWnCshd2FqLfsEA9PFc4w1p2J65bw=
+github.com/kissanjamgit/lulustream v0.0.0-20260521113335-c632d76ef04a h1:h5SK1kVuMdQE+WitD0MAvRNMSmzpNi/lJPeAtuC2mPw=
+github.com/kissanjamgit/lulustream v0.0.0-20260521113335-c632d76ef04a/go.mod h1:HnI7x2iHPUyngpb87hVevNwOj2JFBaTD1zQB3HIERDg=
 github.com/klauspost/compress v1.18.2 h1:iiPHWW0YrcFgpBYhsA6D1+fqHssJscY/Tm/y2Uqnapk=
 github.com/klauspost/compress v1.18.2/go.mod h1:R0h/fSBs8DE4ENlcrlib3PsXS61voFxhIs2DeRhCvJ4=
 github.com/quic-go/qpack v0.6.0 h1:g7W+BMYynC1LbYLSqRt8PBg5Tgwxn214ZZR34VIOjz8=

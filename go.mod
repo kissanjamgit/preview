@@ -16,6 +16,7 @@ require (
 	github.com/bogdanfinn/utls v1.7.7-barnius // indirect
 	github.com/bogdanfinn/websocket v1.5.5-barnius // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
+	github.com/kissanjamgit/lulustream v0.0.0-20260521113335-c632d76ef04a // indirect
 	github.com/klauspost/compress v1.18.2 // indirect
 	github.com/quic-go/qpack v0.6.0 // indirect
 	github.com/spf13/cobra v1.10.2 // indirect

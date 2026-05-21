@@ -19,13 +19,13 @@ import (
 	"github.com/kissanjamgit/ext/hd8k"
 	"github.com/kissanjamgit/ext/kk"
 	"github.com/kissanjamgit/ext/lifese"
-	"github.com/kissanjamgit/ext/lulustream"
 	"github.com/kissanjamgit/ext/pornbox"
 	"github.com/kissanjamgit/ext/savefiles"
 	"github.com/kissanjamgit/ext/streamtape"
 	"github.com/kissanjamgit/ext/strmup"
 	"github.com/kissanjamgit/ext/vidara"
 	"github.com/kissanjamgit/ext/vidnest"
+	"github.com/kissanjamgit/lulustream"
 
 	"github.com/spf13/cobra"
 	"resty.dev/v3"
@@ -178,18 +178,19 @@ func show(cmd *cobra.Command, args []string) (err error) {
 				continue
 			}
 
-			wg.Go(func() {
-				defer func() {
-					<-semaphore
-				}()
+			wg.Go(
+				func() {
+					defer func() {
+						<-semaphore
+					}()
 
-				cr, err := s.Resource(client)
-				if err != nil {
-					inputErrorList = append(inputErrorList, inputError{input: item, err: err})
-					return
-				}
-				CR <- cr
-			},
+					cr, err := s.Resource(client)
+					if err != nil {
+						inputErrorList = append(inputErrorList, inputError{input: item, err: err})
+						return
+					}
+					CR <- cr
+				},
 			)
 		}
 		close(semaphore)
@@ -233,18 +234,19 @@ func play(cmd *cobra.Command, args []string) (err error) {
 				continue
 			}
 
-			wg.Go(func() {
-				defer func() {
-					<-semaphore
-				}()
+			wg.Go(
+				func() {
+					defer func() {
+						<-semaphore
+					}()
 
-				cr, err := s.Resource(client)
-				if err != nil {
-					inputErrorList = append(inputErrorList, inputError{input: item, err: err})
-					return
-				}
-				CR <- cr
-			},
+					cr, err := s.Resource(client)
+					if err != nil {
+						inputErrorList = append(inputErrorList, inputError{input: item, err: err})
+						return
+					}
+					CR <- cr
+				},
 			)
 		}
 		close(semaphore)

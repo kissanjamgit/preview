@@ -5,7 +5,6 @@ go 1.25.1
 require resty.dev/v3 v3.0.0-beta.6
 
 require (
-	github.com/BurntSushi/toml v1.6.0 // indirect
 	github.com/andybalholm/brotli v1.2.0 // indirect
 	github.com/atotto/clipboard v0.1.4 // indirect
 	github.com/bdandy/go-errors v1.2.2 // indirect
@@ -16,10 +15,8 @@ require (
 	github.com/bogdanfinn/utls v1.7.7-barnius // indirect
 	github.com/bogdanfinn/websocket v1.5.5-barnius // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
-	github.com/kissanjamgit/lulustream v0.0.0-20260521113335-c632d76ef04a // indirect
 	github.com/klauspost/compress v1.18.2 // indirect
 	github.com/quic-go/qpack v0.6.0 // indirect
-	github.com/spf13/cobra v1.10.2 // indirect
 	github.com/spf13/pflag v1.0.9 // indirect
 	github.com/tam7t/hpkp v0.0.0-20160821193359-2b70b4024ed5 // indirect
 	github.com/tidwall/gjson v1.18.0 // indirect
@@ -30,4 +27,8 @@ require (
 	golang.org/x/sync v0.20.0 // indirect
 	golang.org/x/sys v0.39.0 // indirect
 	golang.org/x/text v0.32.0 // indirect
+
+	github.com/kissanjamgit/lulustream v0.0.0-20260521113335-c632d76ef04a
+	github.com/BurntSushi/toml v1.6.0
+	github.com/spf13/cobra v1.10.2
 )

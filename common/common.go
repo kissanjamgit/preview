@@ -22,11 +22,11 @@ func PR2String(pr []preview.ContentResource) (string, error) {
 	return buffer.String(), nil
 }
 
+var PlayerArgs = []string{"-"}
+
 func Play(cfg config.Config, str string) (err error) {
-	PlayerArgs := []string{"-"} // stdin input
 	PlayerArgs = append(PlayerArgs, strings.Split(cfg.PlayerArgs, " ")...)
 	playCmd := exec.Command(cfg.Player, PlayerArgs...)
-
 	stdin, err := playCmd.StdinPipe()
 	if err != nil {
 		return

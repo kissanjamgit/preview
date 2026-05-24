@@ -16,6 +16,7 @@ import (
 	"github.com/kissanjamgit/preview/fullp"
 	"github.com/kissanjamgit/preview/hd8k"
 	"github.com/kissanjamgit/preview/hhshot"
+	"github.com/kissanjamgit/preview/hqp"
 	"github.com/kissanjamgit/preview/lifese"
 	"github.com/kissanjamgit/preview/littlecaprice"
 	"github.com/kissanjamgit/preview/newsens"
@@ -54,6 +55,7 @@ var Domain = []preview.Preview{
 	advd.New(),
 	aziani.New(),
 	fullp.New(),
+	hqp.New(),
 }
 
 // todo

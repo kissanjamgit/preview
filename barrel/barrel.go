@@ -13,6 +13,7 @@ import (
 	"github.com/kissanjamgit/preview/enjoyx"
 	"github.com/kissanjamgit/preview/evil"
 	"github.com/kissanjamgit/preview/ftherapy"
+	"github.com/kissanjamgit/preview/fullp"
 	"github.com/kissanjamgit/preview/hd8k"
 	"github.com/kissanjamgit/preview/hhshot"
 	"github.com/kissanjamgit/preview/lifese"
@@ -52,6 +53,7 @@ var Domain = []preview.Preview{
 	blacked.New(),
 	advd.New(),
 	aziani.New(),
+	fullp.New(),
 }
 
 // todo

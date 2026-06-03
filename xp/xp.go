@@ -28,7 +28,7 @@ func New() *xp {
 	return &xp{}
 }
 
-var baseURL = `https://pornxp.ph`
+var baseURL = `https://xpxp.eu/`
 
 func (x xp) get(query []string, index int) (list []preview.ContentResource, err error) {
 	index += 1

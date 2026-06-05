@@ -22,11 +22,13 @@ import (
 	"github.com/kissanjamgit/preview/newsens"
 	"github.com/kissanjamgit/preview/nporn"
 	"github.com/kissanjamgit/preview/pbox"
+	"github.com/kissanjamgit/preview/ph"
 	"github.com/kissanjamgit/preview/private"
 	"github.com/kissanjamgit/preview/pworld"
 	smex "github.com/kissanjamgit/preview/sexmex"
 	"github.com/kissanjamgit/preview/teamskt"
 	"github.com/kissanjamgit/preview/vip"
+	"github.com/kissanjamgit/preview/wh"
 	"github.com/kissanjamgit/preview/xp"
 )
 
@@ -56,6 +58,8 @@ var Domain = []preview.Preview{
 	aziani.New(),
 	fullp.New(),
 	hqp.New(),
+	wh.New(),
+	ph.New(),
 }
 
 // todo
@@ -64,6 +68,7 @@ var Domain = []preview.Preview{
 // https://www.kink.com/
 // https://www.pornfidelity.com/
 // https://bukkake.to/
+// https://hooporn.com/
 // https://pornbox.com/application/studio/328
 // https://pornbox.com/application/model/188419
 // /

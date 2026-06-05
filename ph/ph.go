@@ -3,8 +3,10 @@ package ph
 
 import (
 	"fmt"
+	"math/rand/v2"
 	"net/url"
 	"regexp"
+	"strconv"
 	"strings"
 
 	"github.com/kissanjamgit/preview"
@@ -84,8 +86,8 @@ func (p *ph) Get(index int) ([]preview.ContentResource, error) {
 	}
 }
 
-func shortiesGoRoutine(client *resty.Client) (list []preview.ContentResource, err error) {
-	res, err := client.R().Get(uriShorties)
+func shortiesGoRoutine(req *resty.Request) (list []preview.ContentResource, err error) {
+	res, err := req.Get(uriShorties)
 	if err != nil {
 		return
 	}
@@ -117,20 +119,39 @@ func shortiesGoRoutine(client *resty.Client) (list []preview.ContentResource, er
 
 var regexpEscapeForwardSlash = regexp.MustCompile(`\\/`)
 
+func extTokenAndSeed(s string) (string, string) {
+	seed := regexp.MustCompile(`ddseed = \d+`).FindString(s)
+	return regexp.MustCompile(`var token = "([^"]*)"`).FindString(s), seed
+}
+
 func (p *ph) shorties() (list []preview.ContentResource, err error) {
 	// goRoutine doen't work as expected due to too little time delay all the goRoutine recives the same data, os better live it with sync
 	var g errgroup.Group
-	goRoutineNo := 1
+	goRoutineNo := 5
 	goRoutineList := make([][]preview.ContentResource, goRoutineNo)
 
 	client := resty.New()
 	defer client.Close()
+	res, err := client.R().Get(uriShorties)
+	if err != nil {
+		return
+	}
+	token, seed := extTokenAndSeed(res.String())
+	// https://www.pornhub.org/shorties
+	// uri := url.URL{Host: `www.pornhub.org`, Path: `shorties`, Scheme: "https"}
 	for index := range goRoutineNo {
 		i := index
-		g.Go(
 
+		q := url.Values{}
+		q.Set(`token`, token)
+		q.Set(`seed`, seed)
+		q.Set(`orientation`, `straight`)
+		q.Set(`offset`, strconv.Itoa(rand.IntN(5000)))
+		g.Go(
 			func() (er error) {
-				resList, er := shortiesGoRoutine(client)
+				req := client.R().SetQueryParamsFromValues(q)
+
+				resList, er := shortiesGoRoutine(req)
 				if err != nil {
 					return er
 				}

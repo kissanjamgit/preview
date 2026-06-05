@@ -120,7 +120,7 @@ var regexpEscapeForwardSlash = regexp.MustCompile(`\\/`)
 func (p *ph) shorties() (list []preview.ContentResource, err error) {
 	// goRoutine doen't work as expected due to too little time delay all the goRoutine recives the same data, os better live it with sync
 	var g errgroup.Group
-	goRoutineNo := 5
+	goRoutineNo := 1
 	goRoutineList := make([][]preview.ContentResource, goRoutineNo)
 
 	client := resty.New()

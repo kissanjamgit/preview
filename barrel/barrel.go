@@ -67,6 +67,7 @@ var Domain = []preview.Preview{
 // https://www.pascalssubsluts.com/submissive/updates.php
 // https://www.kink.com/
 // https://www.pornfidelity.com/
+// https://faphouse.com/ultra
 // https://bukkake.to/
 // https://hooporn.com/
 // https://pornbox.com/application/studio/328

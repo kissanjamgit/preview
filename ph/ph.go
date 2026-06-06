@@ -78,7 +78,7 @@ func (p *ph) Get(index int) ([]preview.ContentResource, error) {
 	case `normal`:
 		return p.get(nil, index)
 	case `short`:
-		common.PlayerArgs = append(common.PlayerArgs, `--referrer=https://www.pornhub.org/`)
+		common.PlayerArgs = append(common.PlayerArgs, `--http-header-fields=Referer: https://www.pornhub.org/`, `--ytdl-raw-options=impersonate=chrome`)
 		return p.shorties()
 
 	default:

@@ -4,6 +4,7 @@ package pbk
 import (
 	"fmt"
 	"regexp"
+	"strconv"
 
 	"github.com/kissanjamgit/preview"
 	"github.com/kissanjamgit/preview/config"
@@ -34,7 +35,8 @@ func (p *pbk) Get(index int) (list []preview.ContentResource, err error) {
 	}
 	client := resty.New()
 
-	uri := "https://premiumbukkake.com/tour2/updates/page_1.html"
+	page := index + 1
+	uri := `https://premiumbukkake.com/tour2/updates/page_` + strconv.Itoa(page) + `.html`
 	res, err := client.SetProxy(config.ConfigLazy.Proxy).R().Get(uri)
 	if err != nil {
 		return

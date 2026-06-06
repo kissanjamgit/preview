@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/kissanjamgit/preview"
+	"github.com/kissanjamgit/preview/common"
 	"resty.dev/v3"
 )
 
@@ -31,6 +32,7 @@ func (w *wh) SetSource(source string) {
 }
 
 func (w *wh) get(query []string, index int) (list []preview.ContentResource, err error) {
+	common.PlayerArgs = append(common.PlayerArgs, `--http-header-fields=Referer: https://www.whoreshub.com/`)
 	client := resty.New()
 	uri := "https://www.whoreshub.com/"
 	if len(query) != 0 {

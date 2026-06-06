@@ -8,13 +8,28 @@ import (
 	"github.com/BurntSushi/toml"
 )
 
-type Config struct {
+type ConfigPlayer struct {
 	Player     string `toml:"player"`
 	PlayerArgs string `toml:"playerArgs"`
 }
+type ConfigNetwork struct {
+	Proxy string `toml:"proxy"`
+}
+
+type Config struct {
+	ConfigPlayer
+	ConfigNetwork
+}
+
+var ConfigLazy *Config
+
+var (
+	configPlayer  = ConfigPlayer{Player: "vlc.exe", PlayerArgs: ""}
+	configNetwork = ConfigNetwork{Proxy: `http://127.0.0.1:18080`}
+)
 
 func New() (c Config, err error) {
-	c = Config{Player: "vlc.exe", PlayerArgs: ""}
+	c = Config{ConfigPlayer: configPlayer, ConfigNetwork: configNetwork}
 	homeDir, err := os.UserHomeDir()
 	if err != nil {
 		return
@@ -28,12 +43,17 @@ func New() (c Config, err error) {
 	if err != nil {
 		return
 	}
-	var t Config
 
-	if err = toml.Unmarshal(b, &t); err != nil {
+	if err = toml.Unmarshal(b, &c); err != nil {
 		return
-	} else if (Config{}) != t { // if config is empty
-		c = t
 	}
+	if (c.ConfigPlayer == ConfigPlayer{}) {
+		c.ConfigPlayer = configPlayer
+	}
+	if (c.ConfigNetwork == ConfigNetwork{}) {
+		c.ConfigNetwork = configNetwork
+	}
+	ConfigLazy = &c
+
 	return
 }

@@ -21,6 +21,7 @@ import (
 	"github.com/kissanjamgit/preview/littlecaprice"
 	"github.com/kissanjamgit/preview/newsens"
 	"github.com/kissanjamgit/preview/nporn"
+	"github.com/kissanjamgit/preview/pbk"
 	"github.com/kissanjamgit/preview/pbox"
 	"github.com/kissanjamgit/preview/ph"
 	"github.com/kissanjamgit/preview/private"
@@ -60,6 +61,7 @@ var Domain = []preview.Preview{
 	hqp.New(),
 	wh.New(),
 	ph.New(),
+	pbk.New(),
 }
 
 // todo

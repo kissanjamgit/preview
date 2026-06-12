@@ -8,6 +8,7 @@ import (
 	"github.com/kissanjamgit/preview/aziani"
 	"github.com/kissanjamgit/preview/blacked"
 	"github.com/kissanjamgit/preview/brazz"
+	"github.com/kissanjamgit/preview/bukk"
 	"github.com/kissanjamgit/preview/czechav"
 	"github.com/kissanjamgit/preview/dorcel"
 	"github.com/kissanjamgit/preview/enjoyx"
@@ -24,6 +25,7 @@ import (
 	"github.com/kissanjamgit/preview/pbk"
 	"github.com/kissanjamgit/preview/pbox"
 	"github.com/kissanjamgit/preview/ph"
+	"github.com/kissanjamgit/preview/pimpbunny"
 	"github.com/kissanjamgit/preview/private"
 	"github.com/kissanjamgit/preview/pworld"
 	smex "github.com/kissanjamgit/preview/sexmex"
@@ -62,6 +64,8 @@ var Domain = []preview.Preview{
 	wh.New(),
 	ph.New(),
 	pbk.New(),
+	bukk.New(),
+	pimpbunny.New(),
 }
 
 // todo
@@ -70,7 +74,6 @@ var Domain = []preview.Preview{
 // https://www.kink.com/
 // https://www.pornfidelity.com/
 // https://faphouse.com/ultra
-// https://bukkake.to/
 // https://hooporn.com/
 // https://pornbox.com/application/studio/328
 // https://pornbox.com/application/model/188419

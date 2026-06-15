@@ -15,6 +15,7 @@ type Preview interface {
 type Domain interface {
 	Preview
 	Domain() []string
+	DefaultDomain() string
 }
 
 type Search interface {
@@ -28,5 +29,6 @@ type SearchDomain interface {
 	SearchIdentity()
 	SearchDomainIdentity()
 	Domain() []string
+	DefaultDomain() string
 	Search(query []string, index int) ([]ContentResource, error)
 }

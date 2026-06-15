@@ -14,9 +14,11 @@ type Faphouse struct {
 	Source string // URL domain (e.g., "faphouse.com")
 }
 
-// New creates a new instance of Faphouse
+// New creates a new instance of Faphouse with the default domain
 func New() *Faphouse {
-	return &Faphouse{}
+	return &Faphouse{
+		Source: "faphouse.com",
+	}
 }
 
 // SetSource sets the source URL domain for faphouse
@@ -99,4 +101,14 @@ func (f *Faphouse) Get(index int) ([]preview.ContentResource, error) {
 	}
 
 	return result, nil
+}
+
+// Domain returns the domain of this preview provider
+func (f *Faphouse) Domain() []string {
+	return []string{f.Source}
+}
+
+// DefaultDomain returns the default domain for this preview provider
+func (f *Faphouse) DefaultDomain() string {
+	return "faphouse.com"
 }

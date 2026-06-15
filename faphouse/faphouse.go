@@ -32,67 +32,57 @@ func (f *Faphouse) Name() string {
 }
 
 // Get returns content resources from the faphouse preview at the given index
-func (f *Faphouse) Get(index int) ([]preview.ContentResource, error) {
+func (f *Faphouse) Get(index int) (list []preview.ContentResource, err error) {
+	uri := fmt.Sprintf(`https://faphouse.com/videos?type=new&page=%d`, index+1)
 	if index < 0 {
-		return nil, fmt.Errorf("index out of range")
+		err = fmt.Errorf("index out of range")
+		return
 	}
 
 	if f.Source == "" {
-		return nil, fmt.Errorf("source is required")
+		err = fmt.Errorf("source is required")
+		return
 	}
 
 	client := resty.New()
 	defer client.Close()
 
-	res, err := client.R().Get(f.Source)
+	res, err := client.R().Get(uri)
 	if err != nil {
-		return nil, fmt.Errorf("failed to fetch: %v", err)
+		err = fmt.Errorf("failed to fetch: %v", err)
+		return
 	}
 
 	if res.StatusCode() != 200 {
-		return nil, fmt.Errorf("status code %d", res.StatusCode())
+		err = fmt.Errorf("status code %d", res.StatusCode())
+		return
 	}
 
 	html := res.String()
 
 	var resources []preview.ContentResource
 
-	// Regex to extract data-el-video attribute (source) - uses class names like pimpbunny
 	sourceRegex := regexp.MustCompile(`class="thumb_col4 thumb tv"\s*data-el-video="([^"]+)"`)
 
-	// Regex to extract img src attribute (view) - uses class names like pimpbunny
 	viewRegex := regexp.MustCompile(`class="t-i"\s*src="([^"]+)"`)
 
-	// Find all source matches
 	sourceMatches := sourceRegex.FindAllStringSubmatch(html, -1)
 
-	// Find all view matches
 	viewMatches := viewRegex.FindAllStringSubmatch(html, -1)
 
-	// Pair them up (skip if counts don't match or indices are invalid)
-	for i := 0; i < len(sourceMatches); i++ {
-		if len(sourceMatches[i]) < 2 || len(viewMatches) == 0 {
+	if len(sourceMatches) == len(viewMatches) {
+		err = fmt.Errorf(`len(sourceMatches) == len(viewMatches) `)
+		return
+	}
+	for i, source := range sourceMatches {
+		if len(source) < 2 || len(viewMatches) < 2 {
 			continue
 		}
+		resources = append(resources, preview.ContentResource{
+			Source: sourceMatches[i][1],
+			View:   viewMatches[i][1],
+		})
 
-		// Find corresponding view for this source
-		for j := 0; j < len(viewMatches); j++ {
-			if len(viewMatches[j]) >= 2 {
-				resources = append(resources, preview.ContentResource{
-					Source: sourceMatches[i][1],
-					View:   viewMatches[j][1],
-				})
-				break
-			}
-		}
-
-		if len(viewMatches) > 0 {
-			break
-		}
-	}
-
-	if index >= len(resources) {
-		return nil, fmt.Errorf("index out of range")
 	}
 
 	var result []preview.ContentResource

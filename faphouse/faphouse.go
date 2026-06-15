@@ -107,8 +107,3 @@ func (f *Faphouse) Get(index int) ([]preview.ContentResource, error) {
 func (f *Faphouse) Domain() []string {
 	return []string{f.Source}
 }
-
-// DefaultDomain returns the default domain for this preview provider
-func (f *Faphouse) DefaultDomain() string {
-	return "faphouse.com"
-}

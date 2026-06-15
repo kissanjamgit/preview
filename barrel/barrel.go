@@ -13,6 +13,7 @@ import (
 	"github.com/kissanjamgit/preview/dorcel"
 	"github.com/kissanjamgit/preview/enjoyx"
 	"github.com/kissanjamgit/preview/evil"
+	"github.com/kissanjamgit/preview/faphouse"
 	"github.com/kissanjamgit/preview/ftherapy"
 	"github.com/kissanjamgit/preview/fullp"
 	"github.com/kissanjamgit/preview/hd8k"
@@ -66,6 +67,7 @@ var Domain = []preview.Preview{
 	pbk.New(),
 	bukk.New(),
 	pimpbunny.New(),
+	faphouse.New(),
 }
 
 // todo

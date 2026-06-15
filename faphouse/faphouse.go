@@ -14,7 +14,6 @@ type Faphouse struct {
 	Source string // URL domain (e.g., "faphouse.com")
 }
 
-
 // SetSource sets the source URL domain for faphouse
 func (f *Faphouse) SetSource(source string) {
 	f.Source = source
@@ -31,32 +30,6 @@ func (f *Faphouse) Get(index int) ([]preview.ContentResource, error) {
 		return nil, fmt.Errorf("index out of range")
 	}
 
-	if f.Source == "" {
-		return nil, fmt.Errorf("source is required")
-	}
-
-	html, err := f.fetchHTML(f.Source)
-	if err != nil {
-		return nil, err
-	}
-
-	resources := f.parseHTML(html)
-
-	if index >= len(resources) {
-		return nil, fmt.Errorf("index out of range")
-	}
-
-	var result []preview.ContentResource
-	for i := index; i < len(resources); i++ {
-		result = append(result, resources[i])
-	}
-
-	return result, nil
-}
-
-
-// fetchHTML fetches HTML content from the faphouse source URL domain using resty client
-func (f *Faphouse) fetchHTML() ([]preview.ContentResource, error) {
 	if f.Source == "" {
 		return nil, fmt.Errorf("source is required")
 	}
@@ -78,12 +51,6 @@ func (f *Faphouse) fetchHTML() ([]preview.ContentResource, error) {
 
 	html := res.String()
 
-	return f.parseHTML(html), nil
-}
-
-
-// parseHTML parses HTML content and extracts content resources
-func (f *Faphouse) parseHTML(html string) []preview.ContentResource {
 	var resources []preview.ContentResource
 
 	// Regex to extract data-el-video attribute (source) - uses class names like pimpbunny
@@ -120,5 +87,14 @@ func (f *Faphouse) parseHTML(html string) []preview.ContentResource {
 		}
 	}
 
-	return resources
+	if index >= len(resources) {
+		return nil, fmt.Errorf("index out of range")
+	}
+
+	var result []preview.ContentResource
+	for i := index; i < len(resources); i++ {
+		result = append(result, resources[i])
+	}
+
+	return result, nil
 }

@@ -14,6 +14,11 @@ type Faphouse struct {
 	Source string // URL domain (e.g., "faphouse.com")
 }
 
+// New creates a new instance of Faphouse
+func New() *Faphouse {
+	return &Faphouse{}
+}
+
 // SetSource sets the source URL domain for faphouse
 func (f *Faphouse) SetSource(source string) {
 	f.Source = source

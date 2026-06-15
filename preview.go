@@ -90,16 +90,69 @@ type Faphouse struct {
 		View  string `json:"view"`
 		Source string `json:"source"`
 	}
+	StudioPath faphouse.StudioPath
 }
 
 func (f *Faphouse) Fetch() ([]ContentResource, error) {
-	// Implement fetch logic for faphouse.html
-	return nil, nil
+	pairs, err := f.PairsFromFaphouse()
+	if err != nil {
+		return nil, err
+	}
+
+	var resources []ContentResource
+	for _, pair := range pairs {
+		resources = append(resources, ContentResource{
+			Source: pair.Source,
+			View:   pair.View,
+		})
+	}
+
+	return resources, nil
 }
 
 func (f *Faphouse) ParseViewSourcePairs() ([]ContentResource, error) {
-	// Implement parsing logic for view and source pairs from HTML
-	return nil, nil
+	pairs, err := f.PairsFromFaphouse()
+	if err != nil {
+		return nil, err
+	}
+
+	var resources []ContentResource
+	for _, pair := range pairs {
+		resources = append(resources, ContentResource{
+			Source: pair.Source,
+			View:   pair.View,
+		})
+	}
+
+	return resources, nil
+}
+
+func (f *Faphouse) PairsFromFaphouse() ([]faphouse.FaphousePair, error) {
+	if f.URL == "" {
+		return nil, fmt.Errorf("URL is required")
+	}
+
+	faphouseClient := faphouse.NewFaphouse(f.URL, "faphouse")
+	pairs, err := faphouseClient.FetchHTML()
+	if err != nil {
+		return nil, err
+	}
+
+	return pairs, nil
+}
+
+func (f *Faphouse) GetName() string {
+	if f.StudioPath.name != "" {
+		return f.StudioPath.name
+	}
+	return "faphouse"
+}
+
+func (f *Faphouse) GetPath() string {
+	if f.StudioPath.path != "" {
+		return f.StudioPath.path
+	}
+	return "faphouse"
 }
 
 func main() {

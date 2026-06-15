@@ -1,165 +1,94 @@
+// Package faphouse something
 package faphouse
 
 import (
-	"encoding/json"
 	"fmt"
-	"io"
 	"net/http"
-	"os"
-	"path/filepath"
 	"regexp"
 	"strings"
+
+	"github.com/kissanjamgit/preview"
+	"github.com/kissanjamgit/preview/common"
+	"github.com/kissanjamgit/preview/config"
+	"resty.dev/v3"
 )
 
-type FaphousePair struct {
-	View  string `json:"view"`
-	Source string `json:"source"`
+type pimpbunny struct {
+	Source string
 }
 
-type FaphouseResponse struct {
-	Pairs []FaphousePair `json:"pairs"`
+func New() *pimpbunny {
+	return &pimpbunny{}
 }
 
-type Faphouse struct {
-	URL string
-	Pairs []FaphousePair
-	StudioPath
+func (p *pimpbunny) SetSource(source string) {
+	p.Source = source
 }
 
-type StudioPath struct {
-	name string
-	path string
+func (*pimpbunny) Name() string {
+	return "Pimpbunny"
 }
 
-func (f *Faphouse) Fetch() ([]FaphousePair, error) {
-	resp, err := http.Get(f.URL)
-	if err != nil {
-		return nil, fmt.Errorf("failed to fetch: %v", err)
-	}
-	defer resp.Body.Close()
+const baseURL = `https://pimpbunny.com`
 
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, fmt.Errorf("failed to read response: %v", err)
+func CookiesToString(cookies []*http.Cookie) string {
+	parts := make([]string, 0, len(cookies))
+
+	for _, c := range cookies {
+		parts = append(parts, c.Name+"="+c.Value)
 	}
 
-	var data FaphouseResponse
-	if err := json.Unmarshal(body, &data); err != nil {
-		return parseHTMLPairs(string(body))
-	}
-
-	f.Pairs = data.Pairs
-	return f.Pairs, nil
+	return strings.Join(parts, "; ")
 }
 
-func (f *Faphouse) FetchHTML() ([]FaphousePair, error) {
-	resp, err := http.Get(f.URL)
-	if err != nil {
-		return nil, fmt.Errorf("failed to fetch: %v", err)
-	}
-	defer resp.Body.Close()
-
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, fmt.Errorf("failed to read response: %v", err)
-	}
-
-	f.Pairs, err = parseHTMLPairs(string(body))
-	return f.Pairs, err
-}
-
-func (f *Faphouse) FetchFile() ([]FaphousePair, error) {
-	data, err := os.ReadFile(f.URL)
-	if err != nil {
-		return nil, fmt.Errorf("failed to read file: %v", err)
-	}
-
-	pairs, err := parseHTMLPairs(string(data))
-	if err != nil {
-		return nil, fmt.Errorf("failed to parse file: %v", err)
-	}
-
-	f.Pairs = pairs
-	return f.Pairs, nil
-}
-
-func parseHTMLPairs(htmlContent string) ([]FaphousePair, error) {
-	var pairs []FaphousePair
-
-	// Regex pattern to match view and source attributes in HTML
-	viewRegex := regexp.MustCompile(`(?i)view\s*=\s*["']([^"']+)["']`)
-	sourceRegex := regexp.MustCompile(`(?i)source\s*=\s*["']([^"']+)["']`)
-
-	lines := strings.Split(htmlContent, "\n")
-	for _, line := range lines {
-		line = strings.TrimSpace(line)
-
-		if strings.Contains(line, "view") && strings.Contains(line, "source") {
-			viewMatch := viewRegex.FindStringSubmatch(line)
-			sourceMatch := sourceRegex.FindStringSubmatch(line)
-
-			var view, source string
-			if len(viewMatch) > 1 {
-				view = viewMatch[1]
-			}
-			if len(sourceMatch) > 1 {
-				source = sourceMatch[1]
-			}
-
-			if view != "" && source != "" {
-				pair := FaphousePair{
-					View:  view,
-					Source: source,
-				}
-				pairs = append(pairs, pair)
-			}
-		}
-	}
-
-	return pairs, nil
-}
-
-func (f *Faphouse) GetView() string {
-	return f.URL
-}
-
-func (f *Faphouse) GetSource() string {
-	if len(f.Pairs) > 0 {
-		return f.Pairs[0].Source
-	}
-	return "faphouse"
-}
-
-func (f *Faphouse) GetName() string {
-	return f.name
-}
-
-func (f *Faphouse) GetPath() string {
-	return f.path
-}
-
-func NewFaphouse(url string, name string) *Faphouse {
-	return &Faphouse{
-		URL: url,
-		Pairs: []FaphousePair{},
-		StudioPath: StudioPath{
-			name: name,
-			path: "faphouse",
-		},
-	}
-}
-
-func main() {
-	f := NewFaphouse("http://example.com/faphouse.html", "faphouse")
-	pairs, err := f.FetchHTML()
-	if err != nil {
-		fmt.Printf("Error: %v\n", err)
+func (p *pimpbunny) get(query []string, index int) (list []preview.ContentResource, err error) {
+	page := index + 1
+	var uri string
+	cfg := config.ConfigLazy
+	if cfg == nil {
+		err = fmt.Errorf("config.ConfigLazy == nil")
 		return
 	}
 
-	for _, pair := range pairs {
-		fmt.Printf("View: %s, Source: %s\n", pair.View, pair.Source)
+	if len(query) != 0 {
+		uri = fmt.Sprintf(`%s/search/?q=%s&mode=async&function=get_block&block_id=list_videos_videos_list_search_result&from_videos=%d&ipp=23&page_type=&items_per_page=23&videos_per_page=23&_=1781274060950`, baseURL, strings.Join(query, `%20`), page)
+	} else {
+		uri = fmt.Sprintf(`%s/videos/%d/`, baseURL, page)
+	}
+	client := resty.New()
+
+	res, err := client.R().Get(uri)
+	if err != nil {
+		return
+	}
+	if res.StatusCode() != 200 {
+		err = fmt.Errorf("status code %d", res.StatusCode())
+		return
+	}
+	cookieStr := CookiesToString(res.Cookies())
+	common.PlayerArgs = append(common.PlayerArgs, fmt.Sprintf(`--http-header-fields=Cookie: %s`, cookieStr))
+
+	submatchSource := regexp.MustCompile(`class="ui-card-link__KxRw6l"\s*href="([^"]*)"`).FindAllStringSubmatch(res.String(), -1)
+	submatchView := regexp.MustCompile(`class="\s*ui-card-thumbnail__8dZcLX\s*lazy-load\s"[^>]*data-preview="([^"]*)"`).FindAllStringSubmatch(res.String(), -1)
+	if len(submatchSource) != len(submatchView) {
+		err = fmt.Errorf("len(submatchSource) != len(submatchView), len(submatchSource): %d, len(submatchView): %d", len(submatchSource), len(submatchView))
+		return
 	}
 
-	fmt.Printf("Total pairs found: %d\n", len(pairs))
+	for i, matchSource := range submatchSource {
+		if len(submatchSource) < 2 || len(submatchView) < 2 {
+			continue
+		}
+		list = append(list, preview.ContentResource{Source: matchSource[1], View: submatchView[i][1]})
+	}
+	return
+}
+
+func (p *pimpbunny) Get(index int) (list []preview.ContentResource, err error) {
+	return p.get(nil, index)
+}
+
+func (p *pimpbunny) SearchIdentity() {}
+func (p *pimpbunny) Search(query []string, index int) (list []preview.ContentResource, err error) {
+	return p.get(query, index)
 }

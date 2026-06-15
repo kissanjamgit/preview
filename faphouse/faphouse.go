@@ -3,10 +3,10 @@ package faphouse
 
 import (
 	"fmt"
-	"net/http"
 	"regexp"
 
 	"github.com/kissanjamgit/preview"
+	"resty.dev/v3"
 )
 
 // Faphouse struct for faphouse package
@@ -35,10 +35,7 @@ func (f *Faphouse) Get(index int) ([]preview.ContentResource, error) {
 	}
 
 	client := resty.New()
-	req, err := client.R().SetHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
-	if err != nil {
-		return nil, fmt.Errorf("failed to create request: %v", err)
-	}
+	defer client.Close()
 
 	res, err := client.R().Get(f.Source)
 	if err != nil {

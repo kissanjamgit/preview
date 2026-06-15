@@ -1,94 +1,124 @@
-// Package faphouse something
+// Package faphouse provides preview functionality for faphouse.com
 package faphouse
 
 import (
 	"fmt"
 	"net/http"
 	"regexp"
-	"strings"
 
 	"github.com/kissanjamgit/preview"
-	"github.com/kissanjamgit/preview/common"
-	"github.com/kissanjamgit/preview/config"
-	"resty.dev/v3"
 )
 
-type pimpbunny struct {
-	Source string
+// Faphouse struct for faphouse package
+type Faphouse struct {
+	Source string // URL domain (e.g., "faphouse.com")
 }
 
-func New() *pimpbunny {
-	return &pimpbunny{}
+
+// SetSource sets the source URL domain for faphouse
+func (f *Faphouse) SetSource(source string) {
+	f.Source = source
 }
 
-func (p *pimpbunny) SetSource(source string) {
-	p.Source = source
+// Name returns the name of this preview provider
+func (f *Faphouse) Name() string {
+	return "faphouse"
 }
 
-func (*pimpbunny) Name() string {
-	return "Pimpbunny"
-}
-
-const baseURL = `https://pimpbunny.com`
-
-func CookiesToString(cookies []*http.Cookie) string {
-	parts := make([]string, 0, len(cookies))
-
-	for _, c := range cookies {
-		parts = append(parts, c.Name+"="+c.Value)
+// Get returns content resources from the faphouse preview at the given index
+func (f *Faphouse) Get(index int) ([]preview.ContentResource, error) {
+	if index < 0 {
+		return nil, fmt.Errorf("index out of range")
 	}
 
-	return strings.Join(parts, "; ")
-}
-
-func (p *pimpbunny) get(query []string, index int) (list []preview.ContentResource, err error) {
-	page := index + 1
-	var uri string
-	cfg := config.ConfigLazy
-	if cfg == nil {
-		err = fmt.Errorf("config.ConfigLazy == nil")
-		return
+	if f.Source == "" {
+		return nil, fmt.Errorf("source is required")
 	}
 
-	if len(query) != 0 {
-		uri = fmt.Sprintf(`%s/search/?q=%s&mode=async&function=get_block&block_id=list_videos_videos_list_search_result&from_videos=%d&ipp=23&page_type=&items_per_page=23&videos_per_page=23&_=1781274060950`, baseURL, strings.Join(query, `%20`), page)
-	} else {
-		uri = fmt.Sprintf(`%s/videos/%d/`, baseURL, page)
-	}
-	client := resty.New()
-
-	res, err := client.R().Get(uri)
+	html, err := f.fetchHTML(f.Source)
 	if err != nil {
-		return
+		return nil, err
 	}
+
+	resources := f.parseHTML(html)
+
+	if index >= len(resources) {
+		return nil, fmt.Errorf("index out of range")
+	}
+
+	var result []preview.ContentResource
+	for i := index; i < len(resources); i++ {
+		result = append(result, resources[i])
+	}
+
+	return result, nil
+}
+
+
+// fetchHTML fetches HTML content from the faphouse source URL domain using resty client
+func (f *Faphouse) fetchHTML() ([]preview.ContentResource, error) {
+	if f.Source == "" {
+		return nil, fmt.Errorf("source is required")
+	}
+
+	client := resty.New()
+	req, err := client.R().SetHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
+	if err != nil {
+		return nil, fmt.Errorf("failed to create request: %v", err)
+	}
+
+	res, err := client.R().Get(f.Source)
+	if err != nil {
+		return nil, fmt.Errorf("failed to fetch: %v", err)
+	}
+
 	if res.StatusCode() != 200 {
-		err = fmt.Errorf("status code %d", res.StatusCode())
-		return
-	}
-	cookieStr := CookiesToString(res.Cookies())
-	common.PlayerArgs = append(common.PlayerArgs, fmt.Sprintf(`--http-header-fields=Cookie: %s`, cookieStr))
-
-	submatchSource := regexp.MustCompile(`class="ui-card-link__KxRw6l"\s*href="([^"]*)"`).FindAllStringSubmatch(res.String(), -1)
-	submatchView := regexp.MustCompile(`class="\s*ui-card-thumbnail__8dZcLX\s*lazy-load\s"[^>]*data-preview="([^"]*)"`).FindAllStringSubmatch(res.String(), -1)
-	if len(submatchSource) != len(submatchView) {
-		err = fmt.Errorf("len(submatchSource) != len(submatchView), len(submatchSource): %d, len(submatchView): %d", len(submatchSource), len(submatchView))
-		return
+		return nil, fmt.Errorf("status code %d", res.StatusCode())
 	}
 
-	for i, matchSource := range submatchSource {
-		if len(submatchSource) < 2 || len(submatchView) < 2 {
+	html := res.String()
+
+	return f.parseHTML(html), nil
+}
+
+
+// parseHTML parses HTML content and extracts content resources
+func (f *Faphouse) parseHTML(html string) []preview.ContentResource {
+	var resources []preview.ContentResource
+
+	// Regex to extract data-el-video attribute (source) - uses class names like pimpbunny
+	sourceRegex := regexp.MustCompile(`class="thumb_col4 thumb tv"\s*data-el-video="([^"]+)"`)
+
+	// Regex to extract img src attribute (view) - uses class names like pimpbunny
+	viewRegex := regexp.MustCompile(`class="t-i"\s*src="([^"]+)"`)
+
+	// Find all source matches
+	sourceMatches := sourceRegex.FindAllStringSubmatch(html, -1)
+
+	// Find all view matches
+	viewMatches := viewRegex.FindAllStringSubmatch(html, -1)
+
+	// Pair them up (skip if counts don't match or indices are invalid)
+	for i := 0; i < len(sourceMatches); i++ {
+		if len(sourceMatches[i]) < 2 || len(viewMatches) == 0 {
 			continue
 		}
-		list = append(list, preview.ContentResource{Source: matchSource[1], View: submatchView[i][1]})
+
+		// Find corresponding view for this source
+		for j := 0; j < len(viewMatches); j++ {
+			if len(viewMatches[j]) >= 2 {
+				resources = append(resources, preview.ContentResource{
+					Source: sourceMatches[i][1],
+					View:   viewMatches[j][1],
+				})
+				break
+			}
+		}
+
+		if len(viewMatches) > 0 {
+			break
+		}
 	}
-	return
-}
 
-func (p *pimpbunny) Get(index int) (list []preview.ContentResource, err error) {
-	return p.get(nil, index)
-}
-
-func (p *pimpbunny) SearchIdentity() {}
-func (p *pimpbunny) Search(query []string, index int) (list []preview.ContentResource, err error) {
-	return p.get(query, index)
+	return resources
 }

@@ -18,11 +18,9 @@ import (
 	"github.com/kissanjamgit/preview/fullp"
 	"github.com/kissanjamgit/preview/hd8k"
 	"github.com/kissanjamgit/preview/hhshot"
-	"github.com/kissanjamgit/preview/hooporn"
 	"github.com/kissanjamgit/preview/hqp"
 	"github.com/kissanjamgit/preview/lifese"
 	"github.com/kissanjamgit/preview/littlecaprice"
-	"github.com/kissanjamgit/preview/netfapx"
 	"github.com/kissanjamgit/preview/newsens"
 	"github.com/kissanjamgit/preview/nporn"
 	"github.com/kissanjamgit/preview/pbk"
@@ -71,19 +69,15 @@ var Domain = []preview.Preview{
 	bukk.New(),
 	pimpbunny.New(),
 	faphouse.New(),
-	netfapx.New(),
 	porndd.New(),
-	hooporn.New(),
 }
 
 // todo
 // https://en.inkasex.com/videos/latest
 // https://www.pascalssubsluts.com/submissive/updates.php
 // https://www.kink.com/
-// https://porndd.com/search/Lahlah1684/
 // https://www.pornfidelity.com/
 // https://faphouse.com/ultra
-// https://hooporn.com/
 // https://pornbox.com/application/studio/328
 // https://pornbox.com/application/model/188419
 // /

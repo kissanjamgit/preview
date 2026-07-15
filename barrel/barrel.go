@@ -33,6 +33,7 @@ import (
 	"github.com/kissanjamgit/preview/private"
 	"github.com/kissanjamgit/preview/pworld"
 	smex "github.com/kissanjamgit/preview/sexmex"
+	"github.com/kissanjamgit/preview/sxyprn"
 	"github.com/kissanjamgit/preview/teamskt"
 	"github.com/kissanjamgit/preview/vip"
 	"github.com/kissanjamgit/preview/wh"
@@ -74,6 +75,7 @@ var Domain = []preview.Preview{
 	porndd.New(),
 	pascalssubsluts.New(),
 	kink.New(),
+	sxyprn.New(),
 }
 
 // todo

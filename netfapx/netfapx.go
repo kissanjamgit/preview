@@ -2,7 +2,7 @@
 package netfapx
 
 import (
-	"os"
+	"regexp"
 
 	"github.com/kissanjamgit/preview"
 	"resty.dev/v3"
@@ -46,9 +46,17 @@ func (n *netfapx) Get(index int) ([]preview.ContentResource, error) {
 	if err != nil {
 		return nil, err
 	}
-	os.WriteFile(`context.html`, res.Bytes(), 0o644)
 
-	// TODO: Implement extraction logic here once the site is accessible
-	// regex string <a href="([^"]*)">\s*<img id="d+" src="([^"]*)"
-	return []preview.ContentResource{}, nil
+	re := regexp.MustCompile(`<a href="([^"]*)">\s*<img id="\d+" src="([^"]*)"`)
+	matches := re.FindAllStringSubmatch(res.String(), -1)
+
+	list := make([]preview.ContentResource, 0, len(matches))
+	for _, match := range matches {
+		list = append(list, preview.ContentResource{
+			Source: match[1], // Using href as source name for now
+			View:   match[1], // Using href as view link
+		})
+	}
+
+	return list, nil
 }

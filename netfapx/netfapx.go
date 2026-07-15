@@ -1,3 +1,4 @@
+// pacakge netfapx provides preview functionality for netfapx.com
 package netfapx
 
 import (

@@ -2,6 +2,7 @@ package sxyprn
 
 import (
 	"fmt"
+	"net/url"
 	"strings"
 
 	"github.com/PuerkitoBio/goquery"
@@ -26,11 +27,23 @@ func (s *sxyprn) SetSource(source string) {
 	s.Source = source
 }
 
+func (s *sxyprn) SearchIdentity() {}
+
+func (s *sxyprn) Search(query []string, index int) ([]preview.ContentResource, error) {
+	page := 30 * index
+	// Construct search URL based on query
+	q := strings.Join(query, "-")
+	uri := fmt.Sprintf("https://sxyprn.com/%s.html?page=%d", url.PathEscape(q), page)
+	return s.fetch(uri)
+}
+
 func (s *sxyprn) Get(index int) (list []preview.ContentResource, err error) {
-	// Construct URL
 	page := 30 * index
 	uri := fmt.Sprintf("https://sxyprn.com/http.html?page=%d", page)
+	return s.fetch(uri)
+}
 
+func (s *sxyprn) fetch(uri string) (list []preview.ContentResource, err error) {
 	client := resty.New()
 	if config.ConfigLazy != nil && config.ConfigLazy.Proxy != "" {
 		client.SetProxy(config.ConfigLazy.Proxy)

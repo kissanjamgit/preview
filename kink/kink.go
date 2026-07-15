@@ -51,23 +51,25 @@ func (k *kink) Get(index int) ([]preview.ContentResource, error) {
 		return nil, err
 	}
 
-	// Regex to capture href using the specified class
 	os.WriteFile("context.html", []byte(res.String()), 0o644)
-	re := regexp.MustCompile(`class="d-block overflow-hidden text-elipsis h5"[^>]*href="([^"]*)"`)
+	
+	// Regex to capture href and data-trailer-url
+	re := regexp.MustCompile(`class="d-block overflow-hidden text-elipsis h5"[^>]*href="([^"]*)"[^>]*>[\s\S]*?data-trailer-url="([^"]*)"`)
 	matches := re.FindAllStringSubmatch(res.String(), -1)
 
 	list := make([]preview.ContentResource, 0, len(matches))
 	for _, match := range matches {
-		if len(match) < 2 {
+		if len(match) < 3 {
 			continue
 		}
 
 		// match[1] is the relative URL
 		fullURL := fmt.Sprintf("https://www.kink.com%s", match[1])
+		// match[2] is the trailer URL
 
 		list = append(list, preview.ContentResource{
 			Source: fullURL,
-			View:   fullURL,
+			View:   match[2],
 		})
 	}
 	return list, nil

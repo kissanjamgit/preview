@@ -1,6 +1,9 @@
 package kink
 
 import (
+	"fmt"
+	"regexp"
+
 	"github.com/kissanjamgit/preview"
 	"resty.dev/v3"
 )
@@ -43,15 +46,29 @@ func (k *kink) Get(index int) ([]preview.ContentResource, error) {
 		"TE":                        "trailers",
 	})
 
-	_, err := client.R().Get("https://www.kink.com/shoots?sort=published")
+	res, err := client.R().Get("https://www.kink.com/shoots?sort=published")
 	if err != nil {
 		return nil, err
 	}
 
-	// Placeholder for extraction logic
-	//
-	//<img data-trailer-url="https://cdnp.kink.com/v2/imagedb/shoots/108173/public/trailer/108173_trailer_high.mp4" data-trailer-start="6"  class="has-kink-spinner"/>
-	// regex string <img[^>]*data-trailer-url="[^"]*"
-	// use the shoorts/108173 to create source
-	return []preview.ContentResource{}, nil
+	// Regex to capture data-trailer-url and the ID from the URL
+	re := regexp.MustCompile(`data-trailer-url="([^"]*shoots/(\d+)[^"]*)"`)
+	matches := re.FindAllStringSubmatch(res.String(), -1)
+
+	list := make([]preview.ContentResource, 0, len(matches))
+	for _, match := range matches {
+		if len(match) < 3 {
+			continue
+		}
+		// match[1] is the full trailer URL
+		// match[2] is the ID
+
+		sourceURL := fmt.Sprintf("https://www.kink.com/shoot/%s", match[2])
+
+		list = append(list, preview.ContentResource{
+			Source: sourceURL,
+			View:   match[1], // Using trailer URL as view
+		})
+	}
+	return list, nil
 }

@@ -23,6 +23,7 @@ import (
 	"github.com/kissanjamgit/preview/littlecaprice"
 	"github.com/kissanjamgit/preview/newsens"
 	"github.com/kissanjamgit/preview/nporn"
+	"github.com/kissanjamgit/preview/pascalssubsluts"
 	"github.com/kissanjamgit/preview/pbk"
 	"github.com/kissanjamgit/preview/pbox"
 	"github.com/kissanjamgit/preview/ph"
@@ -70,11 +71,11 @@ var Domain = []preview.Preview{
 	pimpbunny.New(),
 	faphouse.New(),
 	porndd.New(),
+	pascalssubsluts.New(),
 }
 
 // todo
 // https://en.inkasex.com/videos/latest
-// https://www.pascalssubsluts.com/submissive/updates.php
 // https://www.kink.com/
 // https://www.pornfidelity.com/
 // https://faphouse.com/ultra

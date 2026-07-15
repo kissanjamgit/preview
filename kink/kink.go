@@ -57,8 +57,8 @@ func (k *kink) Get(index int) ([]preview.ContentResource, error) {
 	reHref := regexp.MustCompile(`class="d-block overflow-hidden text-elipsis h5"[^>]*href="([^"]*)"`)
 	hrefMatches := reHref.FindAllStringSubmatch(res.String(), -1)
 
-	// Regex 2: Capture data-trailer-url
-	reTrailer := regexp.MustCompile(`data-trailer-url="([^"]*)"`)
+	// Regex 2: Capture data-trailer-url from img tag with class has-kink-spinner
+	reTrailer := regexp.MustCompile(`class="has-kink-spinner"[^>]*data-trailer-url="([^"]*)"`)
 	trailerMatches := reTrailer.FindAllStringSubmatch(res.String(), -1)
 
 	list := make([]preview.ContentResource, 0)

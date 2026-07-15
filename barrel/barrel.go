@@ -77,6 +77,7 @@ var Domain = []preview.Preview{
 	kink.New(),
 	sxyprn.New(),
 	sxyprn.NewBlog(),
+	sxyprn.NewPopular(),
 }
 
 // todo

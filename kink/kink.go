@@ -49,5 +49,9 @@ func (k *kink) Get(index int) ([]preview.ContentResource, error) {
 	}
 
 	// Placeholder for extraction logic
+	//
+	//<img data-trailer-url="https://cdnp.kink.com/v2/imagedb/shoots/108173/public/trailer/108173_trailer_high.mp4" data-trailer-start="6"  class="has-kink-spinner"/>
+	// regex string <img[^>]*data-trailer-url="[^"]*"
+	// use the shoorts/108173 to create source
 	return []preview.ContentResource{}, nil
 }

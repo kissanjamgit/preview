@@ -2,6 +2,7 @@ package pascalssubsluts
 
 import (
 	"fmt"
+	"net/url"
 	"regexp"
 
 	"github.com/kissanjamgit/preview"
@@ -35,22 +36,26 @@ func (p *pascalssubsluts) Get(index int) ([]preview.ContentResource, error) {
 		return nil, err
 	}
 
-	// Regex to capture data-joinimg and href
-	re := regexp.MustCompile(`data-joinimg="([^"]*)"[^>]*href="player-load.php?id=(/d+)"`)
+	// Regex to capture data-joinimg and href ID
+	// Escaped ? and used \d+ for digits
+	re := regexp.MustCompile(`data-joinimg="([^"]*)"[^>]*href="player-load\.php\?id=(\d+)"`)
 	matches := re.FindAllStringSubmatch(res.String(), -1)
 
 	list := make([]preview.ContentResource, 0, len(matches))
-	fmt.Println(matches)
 	for _, match := range matches {
 		if len(match) < 3 {
 			continue
 		}
 
 		// Decode the URL-encoded image source
+		imgURL, err := url.QueryUnescape(match[1])
+		if err != nil {
+			continue
+		}
 
 		list = append(list, preview.ContentResource{
-			Source: match[2], // Using href as source
-			View:   match[1], // Using decoded image URL as view
+			Source: fmt.Sprintf("%s/submissive/player-load.php?id=%s", baseURL, match[2]),
+			View:   imgURL,
 		})
 	}
 

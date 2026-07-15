@@ -59,7 +59,7 @@ func (k *kink) Get(index int) ([]preview.ContentResource, error) {
 
 	// Regex 2: Capture data-trailer-url from img tag with class has-kink-spinner
 	// This regex looks for data-trailer-url and ensures has-kink-spinner is in the class attribute
-	reTrailer := regexp.MustCompile(`data-trailer-url="([^"]*)"[^>]*class="[^"]*has-kink-spinner[^"]*"`)
+	reTrailer := regexp.MustCompile(`data-trailer-url="([^"]*)"[^>]*class="has-kink-spinner"`)
 	trailerMatches := reTrailer.FindAllStringSubmatch(res.String(), -1)
 
 	list := make([]preview.ContentResource, 0)

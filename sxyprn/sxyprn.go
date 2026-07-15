@@ -5,8 +5,9 @@ import (
 	"strings"
 
 	"github.com/PuerkitoBio/goquery"
+	"github.com/go-resty/resty/v2"
 	"github.com/kissanjamgit/preview"
-	"github.com/kissanjamgit/preview/common"
+	"github.com/kissanjamgit/preview/config"
 )
 
 type sxyprn struct {
@@ -30,7 +31,11 @@ func (s *sxyprn) Get(index int) (list []preview.ContentResource, err error) {
 	page := 30 * index
 	uri := fmt.Sprintf("https://sxyprn.com/http.html?page=%d", page)
 
-	client := common.NewClient()
+	client := resty.New()
+	if config.ConfigLazy != nil && config.ConfigLazy.Proxy != "" {
+		client.SetProxy(config.ConfigLazy.Proxy)
+	}
+
 	res, err := client.R().
 		SetHeader("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36").
 		Get(uri)

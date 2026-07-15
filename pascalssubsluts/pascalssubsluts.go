@@ -32,8 +32,8 @@ func (p *pascalssubsluts) Get(index int) ([]preview.ContentResource, error) {
 		return nil, err
 	}
 
-	// Regex to capture data-joinimg and data-modelname
-	re := regexp.MustCompile(`data-joinimg="([^"]*)"[^>]*data-modelname="([^"]*)"`)
+	// Regex to capture data-joinimg and href
+	re := regexp.MustCompile(`data-joinimg="([^"]*)"[^>]*href="([^"]*)"`)
 	matches := re.FindAllStringSubmatch(res.String(), -1)
 
 	list := make([]preview.ContentResource, 0, len(matches))
@@ -49,7 +49,7 @@ func (p *pascalssubsluts) Get(index int) ([]preview.ContentResource, error) {
 		}
 
 		list = append(list, preview.ContentResource{
-			Source: match[2], // Using model name as source
+			Source: match[2], // Using href as source
 			View:   imgURL,   // Using decoded image URL as view
 		})
 	}

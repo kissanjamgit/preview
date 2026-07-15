@@ -46,16 +46,16 @@ func (b Brazz) get(query []string, index int) (list []preview.ContentResource, e
 	defer client.Close()
 	var jwt string
 
-	domain := fmt.Sprintf("https://%s.com/", b.Source)
-	req, err := client.R().SetHeaders(header(nil, domain)).Get(domain)
+	url := fmt.Sprintf("https://%s.com/", b.Source)
+
+	req, err := client.R().SetHeaders(header(nil, url)).Get(url)
 	if err != nil {
 		return
 	}
 	data := regexp.MustCompile(`"jwt":"(\S*?)"`).FindStringSubmatch(req.String())
 	jwt = data[len(data)-1]
 
-	var url string
-	Req := client.R().SetHeaders(header(&jwt, domain))
+	Req := client.R().SetHeaders(header(&jwt, url))
 	if len(query) != 0 {
 		url = fmt.Sprintf("https://site-api.project1service.com/v1/dd/videos?pageType=SEARCH_VIDEOS&limit=24&offset=%d&orderBy=newest&query=%s&sexualOrientation=straight&source=p1", 24*index, strings.Join(query, `+`))
 		res, e := Req.Get(url)
@@ -73,7 +73,7 @@ func (b Brazz) get(query []string, index int) (list []preview.ContentResource, e
 		return list, nil
 	}
 
-	url = fmt.Sprintf("https://site-api.project1service.com/v2/releases?adaptiveStreamingOnly=false&dateReleased=%%3C%s&orderBy=-dateReleased&type=scene&limit=40&offset=%d", time.Now().Format("2006-01-02"), 40*index)
+	url = fmt.Sprintf("https://site-api.project1service.com/v2/releases?adaptiveStreamingOnly=false&dateReleased=<%s&orderBy=-dateReleased&type=scene&limit=24&offset=%d", time.Now().Format("2006-01-02"), 40*index)
 	res, e := Req.Get(url)
 	if err != nil {
 		return nil, e

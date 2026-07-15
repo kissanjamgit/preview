@@ -1,3 +1,4 @@
+// Package kink provides a kink.com scraper
 package kink
 
 import (
@@ -30,7 +31,7 @@ func (k *kink) SearchIdentity() {}
 
 func (k *kink) Search(query []string, index int) ([]preview.ContentResource, error) {
 	q := strings.Join(query, " ")
-	uri := fmt.Sprintf("https://www.kink.com/shoots?sort=published&q=%s&page=%d", url.QueryEscape(q), index+1)
+	uri := fmt.Sprintf("https://www.kink.com/shoots?sort=published&q=%s", url.QueryEscape(q))
 	return k.fetch(uri)
 }
 
@@ -64,24 +65,43 @@ func (k *kink) fetch(uri string) ([]preview.ContentResource, error) {
 	if err != nil {
 		return nil, err
 	}
+	// os.WriteFile("result.txt", res.Bytes(), 0o644)
 
-	regexpTrailer := regexp.MustCompile(`data-trailer-url="([^"]*)"`).FindAllStringSubmatch(res.String(), -1)
+	regexpTrailer := regexp.MustCompile(`<img[^>]*((data-trailer-url="[^"]+")|(data-src="[^"]+"))[^>]*class="has-kink-spinner"\/>`).FindAllStringSubmatch(res.String(), -1) //<img[^>]*(data-trailer-url="([^"]+)")?[^>]*(data-cycle="([^"]+)")?
 
 	list := make([]preview.ContentResource, 0, len(regexpTrailer))
 
-	regexpShootID := regexp.MustCompile(`shoots/(\d+)/`)
+	regexpShootID := regexp.MustCompile(`shoots/(\d+)/|imagedb/(\d+)/`)
 	for _, match := range regexpTrailer {
-		if len(match) < 2 {
-			continue
-		}
-		shootIDMatch := regexpShootID.FindStringSubmatch(match[1])
+
+		var shootID string
+		shootIDMatch := regexpShootID.FindStringSubmatch(match[0])
 		if len(shootIDMatch) < 2 {
 			continue
 		}
-		source := "https://www.kink.com/shoot/" + shootIDMatch[1]
+		if strings.HasPrefix(shootIDMatch[0], `shoots`) {
+			shootID = shootIDMatch[1]
+		} else {
+			shootID = shootIDMatch[2]
+		}
+		source := "https://www.kink.com/shoot/" + shootID
+
+		var view string
+		if after, ok := strings.CutPrefix(match[2], `data-trailer-url=`); ok {
+			view = strings.Trim(after, `"`)
+		} else if after, ok := strings.CutPrefix(match[3], `data-src=`); ok {
+			view = strings.Trim(after, `"`)
+			// view = regexpHTTP.FindString(after)
+			// view = strings.TrimSuffix(view, `&quot`)
+		} else {
+			continue
+			// return nil, fmt.Errorf(`prefix doesn't match %s`, match[2])
+		}
+
 		list = append(list, preview.ContentResource{
 			Source: source,
-			View:   match[1],
+			// Source: `a`,
+			View: view,
 		})
 	}
 	return list, nil

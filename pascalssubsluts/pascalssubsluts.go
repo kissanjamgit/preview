@@ -1,3 +1,4 @@
+// Pacakge pascalssubsluts provides preview functionality for pascalssubsluts.com
 package pascalssubsluts
 
 import (

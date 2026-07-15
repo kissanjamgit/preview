@@ -49,17 +49,16 @@ func (t teamskt) Get(index int) (list []preview.ContentResource, err error) {
 		err = fmt.Errorf("index must be greater than 0")
 		return
 	}
-	studioPath, err := func() (string, error) {
-		for _, sp := range tree {
-			if sp.name != t.Source {
-				continue
-			}
-			return sp.path, nil
+	var studioPath string
+	for _, sp := range tree {
+		if sp.name != t.Source {
+			continue
 		}
-		return ``, fmt.Errorf("invalid source")
-	}()
-	if err != nil {
-		return
+		studioPath = sp.path
+		break
+	}
+	if studioPath == "" {
+		return nil, fmt.Errorf("invalid source")
 	}
 
 	pad := size * index

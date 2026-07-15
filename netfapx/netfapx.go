@@ -42,12 +42,13 @@ func (n *netfapx) Get(index int) ([]preview.ContentResource, error) {
 		"Cache-Control":             "no-cache",
 	})
 
-	res, err := client.R().Get("https://netfapx.com/")
+	res, err := client.SetProxy(`http://127.0.0.1:18080`).R().Get("https://netfapx.com/?orderby=newest")
 	if err != nil {
 		return nil, err
 	}
 	os.WriteFile(`context.html`, res.Bytes(), 0o644)
 
 	// TODO: Implement extraction logic here once the site is accessible
+	// regex string <a href="([^"]*)">\s*<img id="d+" src="([^"]*)"
 	return []preview.ContentResource{}, nil
 }

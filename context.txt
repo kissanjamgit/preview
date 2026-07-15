@@ -1,0 +1,6 @@
+Status Report: Netfapx Extraction Attempt
+
+1. Current Status: The netfapx.com website is currently protected by a Sucuri Website Firewall.
+2. Observation: Even after implementing a Firefox User-Agent in the `netfapx` provider, the server returns an "Access Denied" (Block ID: BLACK02) response.
+3. Conclusion: The firewall is likely blocking the IP address or the request pattern entirely, rendering standard HTTP requests ineffective.
+4. Next Steps: Extraction logic cannot be implemented until the firewall block is bypassed or resolved. The `Get` method in `netfapx/netfapx.go` remains a placeholder.

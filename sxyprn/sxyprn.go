@@ -4,7 +4,6 @@ package sxyprn
 import (
 	"fmt"
 	"net/url"
-	"os"
 	"strings"
 
 	"github.com/PuerkitoBio/goquery"
@@ -88,27 +87,26 @@ func (s *SxyprnBlog) Get(index int) (list []preview.ContentResource, err error) 
 	if err != nil {
 		return
 	}
-	NOEXTLINK := os.Getenv(`NOEXTLINK`) == "1"
 
 	d.Find(".post_el_small").Each(func(i int, g *goquery.Selection) {
 		title := strings.TrimSpace(g.Find(".post_text").Text())
-		extLinkTag := g.Find(`.extlink_icon.extlink`)
+		// extLinkTag := g.Find(`.extlink_icon.extlink`)
 
-		if extLinkTag.Length() > 0 && !NOEXTLINK {
-			srcJpg, ok0 := g.Find(".mini_post_vid_thumb.lazyloaded").Attr("data-src")
-			href, ok1 := extLinkTag.Attr(`href`)
-			if ok0 && ok1 {
-				view := srcJpg
-				if strings.HasPrefix(srcJpg, "//") {
-					view = "https:" + srcJpg
-				}
-				list = append(list, preview.ContentResource{
-					Source: title + ` ` + href,
-					View:   view,
-				})
-				return
-			}
-		}
+		// if extLinkTag.Length() > 0 {
+		// 	srcJpg, ok0 := g.Find(".mini_post_vid_thumb.lazyloaded").Attr("data-src")
+		// 	href, ok1 := extLinkTag.Attr(`href`)
+		// 	if ok0 && ok1 {
+		// 		view := srcJpg
+		// 		if strings.HasPrefix(srcJpg, "//") {
+		// 			view = "https:" + srcJpg
+		// 		}
+		// 		list = append(list, preview.ContentResource{
+		// 			Source: title + ` ` + href,
+		// 			View:   view,
+		// 		})
+		// 		return
+		// 	}
+		// }
 
 		src, ok := g.Find(".hvp_player").Attr("src")
 		if ok {

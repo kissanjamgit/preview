@@ -11,39 +11,9 @@ import (
 	"resty.dev/v3"
 )
 
-type sxyprn struct {
-	Source string
-}
+// --- Shared Logic ---
 
-func New() *sxyprn {
-	return &sxyprn{}
-}
-
-func (s *sxyprn) Name() string {
-	return "sxyprn"
-}
-
-func (s *sxyprn) SetSource(source string) {
-	s.Source = source
-}
-
-func (s *sxyprn) SearchIdentity() {}
-
-func (s *sxyprn) Search(query []string, index int) ([]preview.ContentResource, error) {
-	page := 30 * index
-	q := strings.Join(query, "-")
-	uri := fmt.Sprintf("https://sxyprn.com/%s.html?page=%d", url.PathEscape(q), page)
-	return s.fetch(uri)
-}
-
-func (s *sxyprn) Get(index int) (list []preview.ContentResource, err error) {
-	// page := 30 * index
-	// uri := fmt.Sprintf("https://sxyprn.com/http.html?page=%d", page)
-	uri := fmt.Sprintf("https://sxyprn.net/blog/all/0")
-	return s.fetch(uri)
-}
-
-func (s *sxyprn) fetch(uri string) (list []preview.ContentResource, err error) {
+func fetch(uri string) (*goquery.Document, error) {
 	client := resty.New()
 	if config.ConfigLazy != nil && config.ConfigLazy.Proxy != "" {
 		client.SetProxy(config.ConfigLazy.Proxy)
@@ -53,52 +23,78 @@ func (s *sxyprn) fetch(uri string) (list []preview.ContentResource, err error) {
 		SetHeader("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36").
 		Get(uri)
 	if err != nil {
-		return
+		return nil, err
 	}
 
 	if res.StatusCode() != 200 {
-		err = fmt.Errorf("status code: %d", res.StatusCode())
-		return
+		return nil, fmt.Errorf("status code: %d", res.StatusCode())
 	}
 
-	d, err := goquery.NewDocumentFromReader(strings.NewReader(res.String()))
+	return goquery.NewDocumentFromReader(strings.NewReader(res.String()))
+}
+
+// --- Provider 1: Main Site ---
+
+type Sxyprn struct{}
+
+func New() *Sxyprn { return &Sxyprn{} }
+func (s *Sxyprn) Name() string { return "sxyprn" }
+func (s *Sxyprn) SetSource(source string) {}
+func (s *Sxyprn) SearchIdentity() {}
+
+func (s *Sxyprn) Search(query []string, index int) ([]preview.ContentResource, error) {
+	page := 30 * index
+	q := strings.Join(query, "-")
+	uri := fmt.Sprintf("https://sxyprn.com/%s.html?page=%d", url.PathEscape(q), page)
+	return s.parse(uri)
+}
+
+func (s *Sxyprn) Get(index int) (list []preview.ContentResource, err error) {
+	uri := fmt.Sprintf("https://sxyprn.com/http.html?page=%d", 30*index)
+	return s.parse(uri)
+}
+
+func (s *Sxyprn) parse(uri string) (list []preview.ContentResource, err error) {
+	d, err := fetch(uri)
 	if err != nil {
 		return
 	}
-
-	if strings.HasPrefix(uri, `https://sxyprn.net/blog/`) {
-		d.Find(".post_el_small").Each(func(i int, g *goquery.Selection) {
-			title := g.Find(".post_text").Text()
-			title = strings.TrimSpace(title)
-			g.Find(".extlink_icon extlink")
-			src, ok := g.Find(".hvp_player").Attr("src")
-			if !ok {
-				return
-			}
-
+	d.Find(".post_el_small").Each(func(i int, g *goquery.Selection) {
+		aTag := g.Find("a.tdn.post_time")
+		title, ok := aTag.Attr("title")
+		src, ok2 := g.Find(".hvp_player").Attr("src")
+		if ok && ok2 {
 			list = append(list, preview.ContentResource{
 				Source: strings.NewReplacer("\n", "", "\r", "").Replace(title),
 				View:   "https:" + src,
 			})
-		})
-	} else {
-		d.Find(".post_el_small").Each(func(i int, g *goquery.Selection) {
-			aTag := g.Find("a.tdn.post_time")
-			title, ok := aTag.Attr("title")
-			if !ok {
-				return
-			}
-			src, ok := g.Find(".hvp_player").Attr("src")
-			if !ok {
-				return
-			}
+		}
+	})
+	return
+}
 
-			list = append(list, preview.ContentResource{
-				Source: strings.NewReplacer("\n", "", "\r", "").Replace(title),
-				View:   "https:" + src,
-			})
-		})
+// --- Provider 2: Blog Site ---
+
+type SxyprnBlog struct{}
+
+func NewBlog() *SxyprnBlog { return &SxyprnBlog{} }
+func (s *SxyprnBlog) Name() string { return "sxyprn-blog" }
+func (s *SxyprnBlog) SetSource(source string) {}
+func (s *SxyprnBlog) Get(index int) (list []preview.ContentResource, err error) {
+	uri := "https://sxyprn.net/blog/all/0"
+	d, err := fetch(uri)
+	if err != nil {
+		return
 	}
-
+	d.Find(".post_el_small").Each(func(i int, g *goquery.Selection) {
+		title := strings.TrimSpace(g.Find(".post_text").Text())
+		src, ok := g.Find(".hvp_player").Attr("src")
+		if ok {
+			list = append(list, preview.ContentResource{
+				Source: title,
+				View:   "https:" + src,
+			})
+		}
+	})
 	return
 }

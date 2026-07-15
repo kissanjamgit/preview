@@ -76,6 +76,7 @@ var Domain = []preview.Preview{
 	pascalssubsluts.New(),
 	kink.New(),
 	sxyprn.New(),
+	sxyprn.NewBlog(),
 }
 
 // todo

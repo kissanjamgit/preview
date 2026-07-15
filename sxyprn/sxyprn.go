@@ -1,4 +1,3 @@
-// Package sxyprn
 package sxyprn
 
 import (

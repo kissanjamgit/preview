@@ -2,7 +2,6 @@ package kink
 
 import (
 	"fmt"
-	"os"
 	"regexp"
 
 	"github.com/kissanjamgit/preview"
@@ -46,38 +45,29 @@ func (k *kink) Get(index int) ([]preview.ContentResource, error) {
 		"TE":                        "trailers",
 	})
 
-	res, err := client.R().Get("https://www.kink.com/shoots?sort=published")
+	uri := fmt.Sprintf("https://www.kink.com/shoots?sort=published&page=%d", index+1)
+	res, err := client.R().Get(uri)
 	if err != nil {
 		return nil, err
 	}
 
-	os.WriteFile("context.html", []byte(res.String()), 0o644)
+	regexpTrailer := regexp.MustCompile(`data-trailer-url="([^"]*)"`).FindAllStringSubmatch(res.String(), -1)
 
-	// Regex 1: Capture href
-	reHref := regexp.MustCompile(`class="d-block overflow-hidden text-elipsis h5"[^>]*href="([^"]*)"`)
-	hrefMatches := reHref.FindAllStringSubmatch(res.String(), -1)
+	list := make([]preview.ContentResource, 0, len(regexpTrailer))
 
-	// Regex 2: Capture data-trailer-url from img tag with class has-kink-spinner
-	// This regex looks for data-trailer-url and ensures has-kink-spinner is in the class attribute
-	reTrailer := regexp.MustCompile(`data-trailer-url="([^"]*)"[^>]*class="has-kink-spinner"`)
-	trailerMatches := reTrailer.FindAllStringSubmatch(res.String(), -1)
-
-	if len(hrefMatches) != len(trailerMatches) {
-		return nil, fmt.Errorf("mismatch in number of hrefs (%d) and trailers (%d)", len(hrefMatches), len(trailerMatches))
-	}
-
-	list := make([]preview.ContentResource, 0)
-
-	// Assuming they are in the same order
-	for i := 0; i < len(hrefMatches); i++ {
-		href := hrefMatches[i][1]
-		trailer := trailerMatches[i][1]
-
-		fullURL := fmt.Sprintf("https://www.kink.com%s", href)
-
+	regexpShootID := regexp.MustCompile(`shoots/(\d+)/`)
+	for _, match := range regexpTrailer {
+		if len(match) < 2 {
+			continue
+		}
+		shootIDMatch := regexpShootID.FindStringSubmatch(match[1])
+		if len(shootIDMatch) < 2 {
+			continue
+		}
+		source := "https://www.kink.com/shoot/" + shootIDMatch[1]
 		list = append(list, preview.ContentResource{
-			Source: fullURL,
-			View:   trailer,
+			Source: source,
+			View:   match[1],
 		})
 	}
 	return list, nil

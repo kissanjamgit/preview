@@ -2,6 +2,7 @@ package kink
 
 import (
 	"fmt"
+	"os"
 	"regexp"
 
 	"github.com/kissanjamgit/preview"
@@ -30,7 +31,6 @@ func (k *kink) Get(index int) ([]preview.ContentResource, error) {
 		"User-Agent":                "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:152.0) Gecko/20100101 Firefox/152.0",
 		"Accept":                    "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
 		"Accept-Language":           "en-US,en;q=0.9",
-		"Accept-Encoding":           "gzip, deflate, br, zstd",
 		"Referer":                   "https://www.kink.com/",
 		"Sec-GPC":                   "1",
 		"Connection":                "keep-alive",
@@ -52,6 +52,7 @@ func (k *kink) Get(index int) ([]preview.ContentResource, error) {
 	}
 
 	// Regex to capture href using the specified class
+	os.WriteFile("context.html", []byte(res.String()), 0o644)
 	re := regexp.MustCompile(`class="d-block overflow-hidden text-elipsis h5"[^>]*href="([^"]*)"`)
 	matches := re.FindAllStringSubmatch(res.String(), -1)
 
@@ -60,7 +61,7 @@ func (k *kink) Get(index int) ([]preview.ContentResource, error) {
 		if len(match) < 2 {
 			continue
 		}
-		
+
 		// match[1] is the relative URL
 		fullURL := fmt.Sprintf("https://www.kink.com%s", match[1])
 

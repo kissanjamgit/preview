@@ -62,10 +62,14 @@ func (k *kink) Get(index int) ([]preview.ContentResource, error) {
 	reTrailer := regexp.MustCompile(`data-trailer-url="([^"]*)"[^>]*class="has-kink-spinner"`)
 	trailerMatches := reTrailer.FindAllStringSubmatch(res.String(), -1)
 
+	if len(hrefMatches) != len(trailerMatches) {
+		return nil, fmt.Errorf("mismatch in number of hrefs (%d) and trailers (%d)", len(hrefMatches), len(trailerMatches))
+	}
+
 	list := make([]preview.ContentResource, 0)
 
 	// Assuming they are in the same order
-	for i := 0; i < len(hrefMatches) && i < len(trailerMatches); i++ {
+	for i := 0; i < len(hrefMatches); i++ {
 		href := hrefMatches[i][1]
 		trailer := trailerMatches[i][1]
 

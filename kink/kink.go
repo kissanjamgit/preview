@@ -2,7 +2,9 @@ package kink
 
 import (
 	"fmt"
+	"net/url"
 	"regexp"
+	"strings"
 
 	"github.com/kissanjamgit/preview"
 	"resty.dev/v3"
@@ -24,7 +26,20 @@ func (k *kink) Name() string {
 	return "kink"
 }
 
+func (k *kink) SearchIdentity() {}
+
+func (k *kink) Search(query []string, index int) ([]preview.ContentResource, error) {
+	q := strings.Join(query, " ")
+	uri := fmt.Sprintf("https://www.kink.com/shoots?sort=published&q=%s&page=%d", url.QueryEscape(q), index+1)
+	return k.fetch(uri)
+}
+
 func (k *kink) Get(index int) ([]preview.ContentResource, error) {
+	uri := fmt.Sprintf("https://www.kink.com/shoots?sort=published&page=%d", index+1)
+	return k.fetch(uri)
+}
+
+func (k *kink) fetch(uri string) ([]preview.ContentResource, error) {
 	client := resty.New()
 	client.SetHeaders(map[string]string{
 		"User-Agent":                "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:152.0) Gecko/20100101 Firefox/152.0",
@@ -45,7 +60,6 @@ func (k *kink) Get(index int) ([]preview.ContentResource, error) {
 		"TE":                        "trailers",
 	})
 
-	uri := fmt.Sprintf("https://www.kink.com/shoots?sort=published&page=%d", index+1)
 	res, err := client.R().Get(uri)
 	if err != nil {
 		return nil, err

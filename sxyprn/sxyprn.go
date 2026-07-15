@@ -22,7 +22,7 @@ func fetch(uri string) (*goquery.Document, error) {
 	}
 
 	res, err := client.R().
-		SetHeader("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36").
+		SetHeader("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/139.0.0.0").
 		Get(uri)
 	if err != nil {
 		return nil, err
@@ -93,26 +93,23 @@ func (s *SxyprnBlog) Get(index int) (list []preview.ContentResource, err error) 
 	d.Find(".post_el_small").Each(func(i int, g *goquery.Selection) {
 		title := strings.TrimSpace(g.Find(".post_text").Text())
 		extLinkTag := g.Find(`.extlink_icon.extlink`)
-		fmt.Printf("Item %d: HasExtLink=%v, NOEXTLINK=%v\n", i, extLinkTag.Length() > 0, NOEXTLINK)
-		if extLinkTag.Length() > 0 {
-			if NOEXTLINK {
-				return
-			}
-			srcJpg, ok0 := g.Find(".mini_post_vid_thumb").Attr("data-src")
-			if !ok0 {
-				return
-			}
+
+		if extLinkTag.Length() > 0 && !NOEXTLINK {
+			srcJpg, ok0 := g.Find(".mini_post_vid_thumb.lazyloaded").Attr("data-src")
 			href, ok1 := extLinkTag.Attr(`href`)
-			if !ok1 {
+			if ok0 && ok1 {
+				view := srcJpg
+				if strings.HasPrefix(srcJpg, "//") {
+					view = "https:" + srcJpg
+				}
+				list = append(list, preview.ContentResource{
+					Source: title + ` ` + href,
+					View:   view,
+				})
 				return
 			}
-			title += ` ` + href
-			list = append(list, preview.ContentResource{
-				Source: title,
-				View:   "https:" + srcJpg,
-			})
-			return
 		}
+
 		src, ok := g.Find(".hvp_player").Attr("src")
 		if ok {
 			list = append(list, preview.ContentResource{

@@ -1,8 +1,10 @@
+// Package sxyprn provides a provider for https://sxyprn.com
 package sxyprn
 
 import (
 	"fmt"
 	"net/url"
+	"os"
 	"strings"
 
 	"github.com/PuerkitoBio/goquery"
@@ -37,10 +39,10 @@ func fetch(uri string) (*goquery.Document, error) {
 
 type Sxyprn struct{}
 
-func New() *Sxyprn { return &Sxyprn{} }
-func (s *Sxyprn) Name() string { return "sxyprn" }
+func New() *Sxyprn                        { return &Sxyprn{} }
+func (s *Sxyprn) Name() string            { return "sxyprn" }
 func (s *Sxyprn) SetSource(source string) {}
-func (s *Sxyprn) SearchIdentity() {}
+func (s *Sxyprn) SearchIdentity()         {}
 
 func (s *Sxyprn) Search(query []string, index int) ([]preview.ContentResource, error) {
 	page := 30 * index
@@ -77,17 +79,40 @@ func (s *Sxyprn) parse(uri string) (list []preview.ContentResource, err error) {
 
 type SxyprnBlog struct{}
 
-func NewBlog() *SxyprnBlog { return &SxyprnBlog{} }
-func (s *SxyprnBlog) Name() string { return "sxyprn-blog" }
+func NewBlog() *SxyprnBlog                    { return &SxyprnBlog{} }
+func (s *SxyprnBlog) Name() string            { return "sxyprn-blog" }
 func (s *SxyprnBlog) SetSource(source string) {}
 func (s *SxyprnBlog) Get(index int) (list []preview.ContentResource, err error) {
-	uri := "https://sxyprn.net/blog/all/0"
+	uri := fmt.Sprintf("https://sxyprn.net/blog/all/%d", 20*index)
 	d, err := fetch(uri)
 	if err != nil {
 		return
 	}
+	NOEXTLINK := os.Getenv(`NOEXTLINK`) == "1"
+
 	d.Find(".post_el_small").Each(func(i int, g *goquery.Selection) {
 		title := strings.TrimSpace(g.Find(".post_text").Text())
+		extLinkTag := g.Find(`.extlink_icon.extlink`)
+		fmt.Printf("Item %d: HasExtLink=%v, NOEXTLINK=%v\n", i, extLinkTag.Length() > 0, NOEXTLINK)
+		if extLinkTag.Length() > 0 {
+			if NOEXTLINK {
+				return
+			}
+			srcJpg, ok0 := g.Find(".mini_post_vid_thumb").Attr("data-src")
+			if !ok0 {
+				return
+			}
+			href, ok1 := extLinkTag.Attr(`href`)
+			if !ok1 {
+				return
+			}
+			title += ` ` + href
+			list = append(list, preview.ContentResource{
+				Source: title,
+				View:   "https:" + srcJpg,
+			})
+			return
+		}
 		src, ok := g.Find(".hvp_player").Attr("src")
 		if ok {
 			list = append(list, preview.ContentResource{

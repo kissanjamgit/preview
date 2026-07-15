@@ -53,23 +53,26 @@ func (k *kink) Get(index int) ([]preview.ContentResource, error) {
 
 	os.WriteFile("context.html", []byte(res.String()), 0o644)
 	
-	// Regex to capture href and data-trailer-url
-	re := regexp.MustCompile(`class="d-block overflow-hidden text-elipsis h5"[^>]*href="([^"]*)"[^>]*>[\s\S]*?data-trailer-url="([^"]*)"`)
-	matches := re.FindAllStringSubmatch(res.String(), -1)
+	// Regex 1: Capture href
+	reHref := regexp.MustCompile(`class="d-block overflow-hidden text-elipsis h5"[^>]*href="([^"]*)"`)
+	hrefMatches := reHref.FindAllStringSubmatch(res.String(), -1)
 
-	list := make([]preview.ContentResource, 0, len(matches))
-	for _, match := range matches {
-		if len(match) < 3 {
-			continue
-		}
+	// Regex 2: Capture data-trailer-url
+	reTrailer := regexp.MustCompile(`data-trailer-url="([^"]*)"`)
+	trailerMatches := reTrailer.FindAllStringSubmatch(res.String(), -1)
 
-		// match[1] is the relative URL
-		fullURL := fmt.Sprintf("https://www.kink.com%s", match[1])
-		// match[2] is the trailer URL
+	list := make([]preview.ContentResource, 0)
+	
+	// Assuming they are in the same order
+	for i := 0; i < len(hrefMatches) && i < len(trailerMatches); i++ {
+		href := hrefMatches[i][1]
+		trailer := trailerMatches[i][1]
+
+		fullURL := fmt.Sprintf("https://www.kink.com%s", href)
 
 		list = append(list, preview.ContentResource{
 			Source: fullURL,
-			View:   match[2],
+			View:   trailer,
 		})
 	}
 	return list, nil

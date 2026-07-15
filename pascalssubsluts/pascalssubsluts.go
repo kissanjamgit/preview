@@ -1,7 +1,7 @@
 package pascalssubsluts
 
 import (
-	"net/url"
+	"fmt"
 	"regexp"
 
 	"github.com/kissanjamgit/preview"
@@ -11,6 +11,8 @@ import (
 type pascalssubsluts struct {
 	Source string
 }
+
+var baseURL = "https://www.pascalssubsluts.com"
 
 func New() *pascalssubsluts {
 	return &pascalssubsluts{}
@@ -27,30 +29,28 @@ func (p *pascalssubsluts) Name() string {
 func (p *pascalssubsluts) Get(index int) ([]preview.ContentResource, error) {
 	client := resty.New()
 	// Assuming the updates page is the source of the list
-	res, err := client.R().Get("https://www.pascalssubsluts.com/submissive/updates.php")
+	uri := fmt.Sprintf("%s/submissive/updates.php", baseURL)
+	res, err := client.R().Get(uri)
 	if err != nil {
 		return nil, err
 	}
 
 	// Regex to capture data-joinimg and href
-	re := regexp.MustCompile(`data-joinimg="([^"]*)"[^>]*href="([^"]*)"`)
+	re := regexp.MustCompile(`data-joinimg="([^"]*)"[^>]*href="player-load.php?id=(/d+)"`)
 	matches := re.FindAllStringSubmatch(res.String(), -1)
 
 	list := make([]preview.ContentResource, 0, len(matches))
+	fmt.Println(matches)
 	for _, match := range matches {
 		if len(match) < 3 {
 			continue
 		}
 
 		// Decode the URL-encoded image source
-		imgURL, err := url.QueryUnescape(match[1])
-		if err != nil {
-			continue
-		}
 
 		list = append(list, preview.ContentResource{
 			Source: match[2], // Using href as source
-			View:   imgURL,   // Using decoded image URL as view
+			View:   match[1], // Using decoded image URL as view
 		})
 	}
 

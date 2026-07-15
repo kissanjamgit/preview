@@ -1,3 +1,4 @@
+// Package sxyprn
 package sxyprn
 
 import (
@@ -6,9 +7,9 @@ import (
 	"strings"
 
 	"github.com/PuerkitoBio/goquery"
-	"github.com/go-resty/resty/v2"
 	"github.com/kissanjamgit/preview"
 	"github.com/kissanjamgit/preview/config"
+	"resty.dev/v3"
 )
 
 type sxyprn struct {
@@ -52,7 +53,6 @@ func (s *sxyprn) fetch(uri string) (list []preview.ContentResource, err error) {
 	res, err := client.R().
 		SetHeader("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36").
 		Get(uri)
-
 	if err != nil {
 		return
 	}

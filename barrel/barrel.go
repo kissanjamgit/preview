@@ -19,6 +19,7 @@ import (
 	"github.com/kissanjamgit/preview/hd8k"
 	"github.com/kissanjamgit/preview/hhshot"
 	"github.com/kissanjamgit/preview/hqp"
+	"github.com/kissanjamgit/preview/kink"
 	"github.com/kissanjamgit/preview/lifese"
 	"github.com/kissanjamgit/preview/littlecaprice"
 	"github.com/kissanjamgit/preview/newsens"
@@ -72,11 +73,11 @@ var Domain = []preview.Preview{
 	faphouse.New(),
 	porndd.New(),
 	pascalssubsluts.New(),
+	kink.New(),
 }
 
 // todo
 // https://en.inkasex.com/videos/latest
-// https://www.kink.com/
 // https://www.pornfidelity.com/
 // https://faphouse.com/ultra
 // https://pornbox.com/application/studio/328

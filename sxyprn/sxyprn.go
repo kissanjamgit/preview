@@ -77,7 +77,7 @@ func (s *Sxyprn) parse(uri string) (list []preview.ContentResource, err error) {
 
 // --- Provider 2: Blog Site ---
 
-var blog = map[string]string{`sxyprnBlog`: `all`, `ILUVY`: `5f3950a938042`, `AJ47`: `@AJ47`, `mikess`: `@mikess`, `Ajx`: `@Ajx`, `PornoBB`: `66326b4fdfd13`, `DemonINC`: `64d19fdf6970d`, `iAmFckr`: `667bfa40a223f`, `RIPNSFW`: `604868c9e12f6`, `sandy998`: `67b6a8c5c1227`, `scfc`: `6803728ea8837`, `VOOP`: `6a1f341252008`}
+var blog = map[string]string{`sxyprnBlog`: `all`, `ILUVY`: `5f3950a938042`, `AJ47`: `@AJ47`, `mikess`: `@mikess`, `Ajx`: `@Ajx`, `PornoBB`: `66326b4fdfd13`, `DemonINC`: `64d19fdf6970d`, `iAmFckr`: `667bfa40a223f`, `RIPNSFW`: `604868c9e12f6`, `sandy998`: `67b6a8c5c1227`, `scfc`: `6803728ea8837`, `VOOP`: `6a1f341252008`, `JORDAN888`: `643b5d34ef375`}
 
 type SxyprnBlog struct {
 	Source string
